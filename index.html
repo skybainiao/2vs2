@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+    <title>2VS2</title>
+</head>
+
+<body class="bg-gray-100">
+    <!-- 顶部导航栏 -->
+    <nav class="bg-white shadow-md">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <a href="#" class="text-xl font-bold text-blue-600">2VS2</a>
+            <div class="flex space-x-4">
+                <a href="#" class="text-gray-700 hover:text-blue-600">首页</a>
+                <a href="binding.html" class="text-gray-700 hover:text-blue-600">绑定</a>
+                <a href="real_time_odds.html" class="text-gray-700 hover:text-blue-600">实时赔率</a>
+                <a href="binding_record.html" class="text-gray-700 hover:text-blue-600">绑定记录</a>
+                <a href="betting_record.html" class="text-gray-700 hover:text-blue-600">投注记录</a>
+            </div>
+            <div class="flex space-x-2">
+                <a href="#" class="text-gray-700 hover:text-blue-600">登录</a>
+                <a href="#" class="text-gray-700 hover:text-blue-600">注册</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 轮播图 -->
+    <div class="relative w-full h-64">
+        <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('https://picsum.photos/1200/400');">
+            <div class="absolute inset-0 bg-black opacity-50"></div>
+            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-center">
+                <h1 class="text-4xl font-bold mb-4">热门赛事，精彩不停</h1>
+                <a href="#"
+                    class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">立即投注</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 热门赛事推荐 -->
+    <div class="container mx-auto px-4 py-8">
+        <h2 class="text-2xl font-bold mb-4">热门赛事推荐</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="bg-white shadow-md rounded p-4">
+                <h3 class="text-lg font-bold mb-2">英超：曼城 vs 利物浦</h3>
+                <p class="text-gray-600 mb-2">开赛时间：2025-04-20 20:00</p>
+                <div class="flex justify-between">
+                    <span class="text-green-600 font-bold">主胜：1.85</span>
+                    <span class="text-yellow-600 font-bold">平局：3.50</span>
+                    <span class="text-red-600 font-bold">客胜：4.20</span>
+                </div>
+                <a href="#"
+                    class="block bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 text-center">立即投注</a>
+            </div>
+            <div class="bg-white shadow-md rounded p-4">
+                <h3 class="text-lg font-bold mb-2">西甲：皇马 vs 巴萨</h3>
+                <p class="text-gray-600 mb-2">开赛时间：2025-04-22 21:00</p>
+                <div class="flex justify-between">
+                    <span class="text-green-600 font-bold">主胜：2.10</span>
+                    <span class="text-yellow-600 font-bold">平局：3.20</span>
+                    <span class="text-red-600 font-bold">客胜：3.80</span>
+                </div>
+                <a href="#"
+                    class="block bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 text-center">立即投注</a>
+            </div>
+            <div class="bg-white shadow-md rounded p-4">
+                <h3 class="text-lg font-bold mb-2">欧冠：拜仁 vs 巴黎</h3>
+                <p class="text-gray-600 mb-2">开赛时间：2025-04-25 20:45</p>
+                <div class="flex justify-between">
+                    <span class="text-green-600 font-bold">主胜：1.95</span>
+                    <span class="text-yellow-600 font-bold">平局：3.30</span>
+                    <span class="text-red-600 font-bold">客胜：4.00</span>
+                </div>
+                <a href="#"
+                    class="block bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 text-center">立即投注</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 最新资讯 -->
+    <div class="container mx-auto px-4 py-8">
+        <h2 class="text-2xl font-bold mb-4">最新更新</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-white shadow-md rounded p-4">
+                <h3 class="text-lg font-bold mb-2"> </h3>
+                <p class="text-gray-600"> </p>
+                <a href="#" class="text-blue-600 hover:text-blue-700">查看详情</a>
+            </div>
+            <div class="bg-white shadow-md rounded p-4">
+                <h3 class="text-lg font-bold mb-2"> </h3>
+                <p class="text-gray-600"> </p>
+                <a href="#" class="text-blue-600 hover:text-blue-700">查看详情</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部信息 -->
+    <footer class="bg-white shadow-md">
+        <div class="container mx-auto px-4 py-4 text-center text-gray-600">
+            <p>&copy; 2025 2VS2 版权所有</p>
+             
+        </div>
+    </footer>
+</body>
+
+</html>
+    

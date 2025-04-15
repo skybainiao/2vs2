@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+    <title>绑定管理</title>
+    <style>
+        /* 自定义表格行样式 */
+        .data-table tr:hover {
+            background-color: rgba(131, 192, 253, 0.1);
+        }
+
+        .bound-row {
+            background-color: rgba(248, 175, 175, 0.2);
+        }
+
+        /* 选中行样式 */
+        .selected-row {
+            background-color: rgba(75, 82, 248, 0.15);
+            border-left: 3px solid #4B52F8;
+            font-weight: 500;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100">
+    <!-- 顶部导航栏 -->
+    <nav class="bg-white shadow-md">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <a href="index.html" class="text-xl font-bold text-blue-600">2VS2</a>
+            <div class="flex space-x-4">
+                <a href="index.html" class="text-gray-700 hover:text-blue-600">首页</a>
+                <a href="binding.html" class="text-gray-700 hover:text-blue-600">绑定</a>
+                <a href="real_time_odds.html" class="text-gray-700 hover:text-blue-600">实时赔率</a>
+                <a href="binding_record.html" class="text-gray-700 hover:text-blue-600">绑定记录</a>
+                <a href="betting_record.html" class="text-gray-700 hover:text-blue-600">投注记录</a>
+            </div>
+            <div class="flex space-x-2">
+                <a href="#" class="text-gray-700 hover:text-blue-600">登录</a>
+                <a href="#" class="text-gray-700 hover:text-blue-600">注册</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主内容区 -->
+    <div class="container mx-auto px-6 py-8 grid grid-cols-12 gap-6">
+        <!-- 左侧数据源区域（占8列） -->
+        <div class="col-span-12 lg:col-span-8">
+            <!-- A网数据卡片 -->
+            <div class="bg-white shadow-lg rounded-lg p-6">
+                <div class="flex justify-between items-start mb-6">
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-800">A网数据</h3>
+                        <p class="text-sm text-gray-500">实时更新的赛事数据</p>
+                    </div>
+                    <!-- 操作按钮区 -->
+                    <div class="flex items-center space-x-4">
+                        <!-- 搜索框 -->
+                        <div class="relative">
+                            <input type="text" placeholder="搜索联赛/球队/时间"
+                                class="border border-gray-300 rounded-lg px-4 py-2 w-80 focus:outline-none focus:border-blue-600">
+                        </div>
+                        <!-- 功能按钮 -->
+                        <div class="flex items-center space-x-2">
+                            <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                                选择数据源
+                            </button>
+                            <button class="bg-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300">
+                                刷新
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- 数据表格 -->
+                <div class="h-80 overflow-y-auto">
+                    <table class="w-full data-table">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="px-4 py-3 text-sm font-medium text-gray-700 text-left">比赛时间</th>
+                                <th class="px-4 py-3 text-sm font-medium text-gray-700 text-left">联赛</th>
+                                <th class="px-4 py-3 text-sm font-medium text-gray-700 text-left">主队</th>
+                                <th class="px-4 py-3 text-sm font-medium text-gray-700 text-left">客队</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="hover:bg-blue-50" onclick="selectRow(this, 'a')">
+                                <td class="px-4 py-4 text-sm text-gray-800">20:00</td>
+                                <td class="px-4 py-4 text-sm text-gray-800">英超</td>
+                                <td class="px-4 py-4 text-sm text-gray-800">曼城</td>
+                                <td class="px-4 py-4 text-sm text-gray-800">利物浦</td>
+                            </tr>
+                            <tr class="hover:bg-blue-50 bound-row" onclick="selectRow(this, 'a')">
+                                <td class="px-4 py-4 text-sm text-gray-800">21:00</td>
+                                <td class="px-4 py-4 text-sm text-gray-800">西甲</td>
+                                <td class="px-4 py-4 text-sm text-gray-800">皇马</td>
+                                <td class="px-4 py-4 text-sm text-gray-800">巴萨</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- B网数据卡片 -->
+            <div class="bg-white shadow-lg rounded-lg p-6 mt-8">
+                <div class="flex justify-between items-start mb-6">
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-800">B网数据</h3>
+                        <p class="text-sm text-gray-500">实时更新的赛事数据</p>
+                    </div>
+                    <!-- 操作按钮区 -->
+                    <div class="flex items-center space-x-4">
+                        <!-- 搜索框 -->
+                        <div class="relative">
+                            <input type="text" placeholder="搜索联赛/球队/时间"
+                                class="border border-gray-300 rounded-lg px-4 py-2 w-80 focus:outline-none focus:border-blue-600">
+                        </div>
+                        <!-- 功能按钮 -->
+                        <div class="flex items-center space-x-2">
+                            <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                                选择数据源
+                            </button>
+                            <button class="bg-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300">
+                                刷新
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- 数据表格 -->
+                <div class="h-80 overflow-y-auto">
+                    <table class="w-full data-table">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="px-4 py-3 text-sm font-medium text-gray-700 text-left">比赛时间</th>
+                                <th class="px-4 py-3 text-sm font-medium text-gray-700 text-left">联赛</th>
+                                <th class="px-4 py-3 text-sm font-medium text-gray-700 text-left">主队</th>
+                                <th class="px-4 py-3 text-sm font-medium text-gray-700 text-left">客队</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="hover:bg-blue-50" onclick="selectRow(this, 'b')">
+                                <td class="px-4 py-4 text-sm text-gray-800">20:30</td>
+                                <td class="px-4 py-4 text-sm text-gray-800">意甲</td>
+                                <td class="px-4 py-4 text-sm text-gray-800">尤文图斯</td>
+                                <td class="px-4 py-4 text-sm text-gray-800">AC米兰</td>
+                            </tr>
+                            <tr class="hover:bg-blue-50 bound-row" onclick="selectRow(this, 'b')">
+                                <td class="px-4 py-4 text-sm text-gray-800">22:00</td>
+                                <td class="px-4 py-4 text-sm text-gray-800">德甲</td>
+                                <td class="px-4 py-4 text-sm text-gray-800">拜仁慕尼黑</td>
+                                <td class="px-4 py-4 text-sm text-gray-800">多特蒙德</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧绑定管理区域（占4列） -->
+        <div class="col-span-12 lg:col-span-4">
+            <!-- 过滤与阈值设置卡片 -->
+            <div class="bg-white shadow-lg rounded-lg p-6">
+                <h4 class="text-base font-bold text-gray-800 mb-4">绑定过滤设置</h4>
+                <div class="flex flex-col space-y-4">
+                    <!-- 时间对比开关 -->
+                    <div class="flex items-center space-x-2">
+                        <input type="checkbox" id="timeCompare" class="w-4 h-4 accent-blue-600">
+                        <label for="timeCompare" class="text-sm font-medium text-gray-700">启用时间对比</label>
+                    </div>
+                    <!-- 过滤关键字 -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">过滤关键字（分号分隔）</label>
+                        <input type="text" value="AC;AS;FC;City;United"
+                            class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-600">
+                    </div>
+                    <!-- 相似度阈值 -->
+                    <div class="flex items-center space-x-4">
+                        <label class="text-sm font-medium text-gray-700">相似度阈值：</label>
+                        <div class="flex items-center space-x-2">
+                            <input type="range" min="0" max="1" step="0.05" value="0.85"
+                                class="w-40 appearance-none bg-gray-200 rounded-full h-1.5 cursor-pointer"
+                                style="background: linear-gradient(to right, #4B52F8 85%, #eee 85%);">
+                            <span class="text-sm font-medium text-gray-800" id="precisionValue">0.85</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 已绑定比赛管理卡片 -->
+            <div class="bg-white shadow-lg rounded-lg p-6 mt-8">
+                <h4 class="text-base font-bold text-gray-800 mb-4">已绑定比赛列表</h4>
+                <!-- 操作按钮区 -->
+                <div class="flex justify-end space-x-2 mb-4">
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" id="addBindingBtn">添加绑定</button>
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">模糊绑定</button>
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">自定义绑定</button>
+                    <button class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">移除绑定</button>
+                    <button class="bg-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300">清空所有</button>
+                </div>
+                <!-- 绑定记录 -->
+                <div class="h-80 overflow-y-auto">
+                    <div class="space-y-6" id="boundMatchesContainer">
+                        <!-- 动态生成的绑定记录会放在这里 -->
+                        <!-- 示例记录（可删除） -->
+                        <div class="border rounded-lg p-5">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">联赛对比</p>
+                                    <span class="text-gray-600">A网：英超 | B网：英超</span>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">时间对比</p>
+                                    <span class="text-gray-600">20:00 | 20:00</span>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <p class="text-sm font-medium text-gray-800">球队对比</p>
+                                <div class="flex space-x-6">
+                                    <div>
+                                        <span class="block text-gray-600">主队：曼城（A网） vs 曼城（B网）</span>
+                                    </div>
+                                    <div>
+                                        <span class="block text-gray-600">客队：利物浦（A网） vs 利物浦（B网）</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部信息 -->
+    <footer class="bg-white shadow-md mt-8">
+        <div class="container mx-auto px-4 py-4 text-center text-gray-600">
+            <p>&copy; 2025 足球博彩网站 版权所有</p>
+            <p>请理性投注，赌博成瘾请立即寻求帮助</p>
+        </div>
+    </footer>
+
+    <!-- 选中行处理脚本 -->
+    <script>
+        let selectedARow = null;
+        let selectedBRow = null;
+
+        function selectRow(row, source) {
+            // 清除对应数据源的旧选中状态
+            if (source === 'a') {
+                if (selectedARow) {
+                    selectedARow.classList.remove('selected-row');
+                }
+                selectedARow = row;
+            } else {
+                if (selectedBRow) {
+                    selectedBRow.classList.remove('selected-row');
+                }
+                selectedBRow = row;
+            }
+            // 添加新选中状态
+            row.classList.add('selected-row');
+            
+            // 激活添加绑定按钮（可根据需求扩展）
+            document.getElementById('addBindingBtn').disabled = false;
+        }
+
+        // 示例：添加绑定按钮逻辑（可根据实际需求扩展）
+        document.getElementById('addBindingBtn').addEventListener('click', () => {
+            if (selectedARow && selectedBRow) {
+                // 此处可获取两行数据进行绑定操作
+                const aData = {
+                    time: selectedARow.cells[0].textContent,
+                    league: selectedARow.cells[1].textContent,
+                    home: selectedARow.cells[2].textContent,
+                    away: selectedARow.cells[3].textContent
+                };
+                const bData = {
+                    time: selectedBRow.cells[0].textContent,
+                    league: selectedBRow.cells[1].textContent,
+                    home: selectedBRow.cells[2].textContent,
+                    away: selectedBRow.cells[3].textContent
+                };
+                // 模拟生成绑定记录（实际需插入到DOM或调用API）
+                const newRecord = document.createElement('div');
+                newRecord.className = 'border rounded-lg p-5';
+                newRecord.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-sm font-medium text-gray-800">联赛对比</p>
+                            <span class="text-gray-600">A网：${aData.league} | B网：${bData.league}</span>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-800">时间对比</p>
+                            <span class="text-gray-600">${aData.time} | ${bData.time}</span>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <p class="text-sm font-medium text-gray-800">球队对比</p>
+                        <div class="flex space-x-6">
+                            <div>
+                                <span class="block text-gray-600">主队：${aData.home}（A网） vs ${bData.home}（B网）</span>
+                            </div>
+                            <div>
+                                <span class="block text-gray-600">客队：${aData.away}（A网） vs ${bData.away}（B网）</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('boundMatchesContainer').prepend(newRecord);
+                // 清除选中状态（可选）
+                selectedARow.classList.remove('selected-row');
+                selectedBRow.classList.remove('selected-row');
+                selectedARow = null;
+                selectedBRow = null;
+            }
+        });
+    </script>
+</body>
+
+</html>
