@@ -23,6 +23,31 @@
             border-left: 3px solid #4B52F8;
             font-weight: 500;
         }
+
+        /* 加载动画样式 */
+        .loading {
+            display: none;
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #000;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* 错误提示样式 */
+        .error-message {
+            color: red;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
     </style>
 </head>
 
@@ -53,8 +78,10 @@
             <div class="bg-white shadow-lg rounded-lg p-6">
                 <div class="flex justify-between items-start mb-6">
                     <div>
-                        <h3 class="text-lg font-bold text-gray-800">A网数据</h3>
+                        <h3 class="text-lg font-bold text-gray-800">A网数据（1网）</h3>
                         <p class="text-sm text-gray-500">实时更新的赛事数据</p>
+                        <p class="text-sm text-gray-500" id="a-count">比赛数量：0</p>
+                        <p class="error-message" id="a-error"></p>
                     </div>
                     <!-- 操作按钮区 -->
                     <div class="flex items-center space-x-4">
@@ -65,18 +92,16 @@
                         </div>
                         <!-- 功能按钮 -->
                         <div class="flex items-center space-x-2">
-                            <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-                                选择数据源
-                            </button>
-                            <button class="bg-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300">
+                            <button class="bg-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300" onclick="fetchData('http://localhost:6001/today_fixtures', 'a', this)">
                                 刷新
                             </button>
+                            <div class="loading" id="a-loading"></div>
                         </div>
                     </div>
                 </div>
                 <!-- 数据表格 -->
                 <div class="h-80 overflow-y-auto">
-                    <table class="w-full data-table">
+                    <table class="w-full data-table" id="a-table">
                         <thead>
                             <tr class="bg-gray-100">
                                 <th class="px-4 py-3 text-sm font-medium text-gray-700 text-left">比赛时间</th>
@@ -86,18 +111,6 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr class="hover:bg-blue-50" onclick="selectRow(this, 'a')">
-                                <td class="px-4 py-4 text-sm text-gray-800">20:00</td>
-                                <td class="px-4 py-4 text-sm text-gray-800">英超</td>
-                                <td class="px-4 py-4 text-sm text-gray-800">曼城</td>
-                                <td class="px-4 py-4 text-sm text-gray-800">利物浦</td>
-                            </tr>
-                            <tr class="hover:bg-blue-50 bound-row" onclick="selectRow(this, 'a')">
-                                <td class="px-4 py-4 text-sm text-gray-800">21:00</td>
-                                <td class="px-4 py-4 text-sm text-gray-800">西甲</td>
-                                <td class="px-4 py-4 text-sm text-gray-800">皇马</td>
-                                <td class="px-4 py-4 text-sm text-gray-800">巴萨</td>
-                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -107,8 +120,10 @@
             <div class="bg-white shadow-lg rounded-lg p-6 mt-8">
                 <div class="flex justify-between items-start mb-6">
                     <div>
-                        <h3 class="text-lg font-bold text-gray-800">B网数据</h3>
+                        <h3 class="text-lg font-bold text-gray-800">B网数据（2网）</h3>
                         <p class="text-sm text-gray-500">实时更新的赛事数据</p>
+                        <p class="text-sm text-gray-500" id="b-count">比赛数量：0</p>
+                        <p class="error-message" id="b-error"></p>
                     </div>
                     <!-- 操作按钮区 -->
                     <div class="flex items-center space-x-4">
@@ -119,18 +134,16 @@
                         </div>
                         <!-- 功能按钮 -->
                         <div class="flex items-center space-x-2">
-                            <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-                                选择数据源
-                            </button>
-                            <button class="bg-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300">
+                            <button class="bg-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300" onclick="fetchData('http://localhost:6002/matches', 'b', this)">
                                 刷新
                             </button>
+                            <div class="loading" id="b-loading"></div>
                         </div>
                     </div>
                 </div>
                 <!-- 数据表格 -->
                 <div class="h-80 overflow-y-auto">
-                    <table class="w-full data-table">
+                    <table class="w-full data-table" id="b-table">
                         <thead>
                             <tr class="bg-gray-100">
                                 <th class="px-4 py-3 text-sm font-medium text-gray-700 text-left">比赛时间</th>
@@ -140,18 +153,48 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr class="hover:bg-blue-50" onclick="selectRow(this, 'b')">
-                                <td class="px-4 py-4 text-sm text-gray-800">20:30</td>
-                                <td class="px-4 py-4 text-sm text-gray-800">意甲</td>
-                                <td class="px-4 py-4 text-sm text-gray-800">尤文图斯</td>
-                                <td class="px-4 py-4 text-sm text-gray-800">AC米兰</td>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- C网数据卡片 -->
+            <div class="bg-white shadow-lg rounded-lg p-6 mt-8">
+                <div class="flex justify-between items-start mb-6">
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-800">C网数据（3网）</h3>
+                        <p class="text-sm text-gray-500">实时更新的赛事数据</p>
+                        <p class="text-sm text-gray-500" id="c-count">比赛数量：0</p>
+                        <p class="error-message" id="c-error"></p>
+                    </div>
+                    <!-- 操作按钮区 -->
+                    <div class="flex items-center space-x-4">
+                        <!-- 搜索框 -->
+                        <div class="relative">
+                            <input type="text" placeholder="搜索联赛/球队/时间"
+                                class="border border-gray-300 rounded-lg px-4 py-2 w-80 focus:outline-none focus:border-blue-600">
+                        </div>
+                        <!-- 功能按钮 -->
+                        <div class="flex items-center space-x-2">
+                            <button class="bg-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300" onclick="fetchData('http://localhost:6003/get_soccer_events', 'c', this)">
+                                刷新
+                            </button>
+                            <div class="loading" id="c-loading"></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 数据表格 -->
+                <div class="h-80 overflow-y-auto">
+                    <table class="w-full data-table" id="c-table">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="px-4 py-3 text-sm font-medium text-gray-700 text-left">比赛时间</th>
+                                <th class="px-4 py-3 text-sm font-medium text-gray-700 text-left">联赛</th>
+                                <th class="px-4 py-3 text-sm font-medium text-gray-700 text-left">主队</th>
+                                <th class="px-4 py-3 text-sm font-medium text-gray-700 text-left">客队</th>
                             </tr>
-                            <tr class="hover:bg-blue-50 bound-row" onclick="selectRow(this, 'b')">
-                                <td class="px-4 py-4 text-sm text-gray-800">22:00</td>
-                                <td class="px-4 py-4 text-sm text-gray-800">德甲</td>
-                                <td class="px-4 py-4 text-sm text-gray-800">拜仁慕尼黑</td>
-                                <td class="px-4 py-4 text-sm text-gray-800">多特蒙德</td>
-                            </tr>
+                        </thead>
+                        <tbody>
                         </tbody>
                     </table>
                 </div>
@@ -212,19 +255,11 @@
                                 </div>
                                 <div>
                                     <p class="text-sm font-medium text-gray-800">时间对比</p>
-                                    <span class="text-gray-600">20:00 | 20:00</span>
+                                    <span class="text-gray-600">20:00 vs 20:30</span>
                                 </div>
                             </div>
-                            <div class="mt-4">
-                                <p class="text-sm font-medium text-gray-800">球队对比</p>
-                                <div class="flex space-x-6">
-                                    <div>
-                                        <span class="block text-gray-600">主队：曼城（A网） vs 曼城（B网）</span>
-                                    </div>
-                                    <div>
-                                        <span class="block text-gray-600">客队：利物浦（A网） vs 利物浦（B网）</span>
-                                    </div>
-                                </div>
+                            <div class="mt-4 text-sm text-gray-600">
+                                主队：曼城 vs 尤文图斯 | 客队：利物浦 vs AC米兰
                             </div>
                         </div>
                     </div>
@@ -233,90 +268,82 @@
         </div>
     </div>
 
-    <!-- 底部信息 -->
-    <footer class="bg-white shadow-md mt-8">
-        <div class="container mx-auto px-4 py-4 text-center text-gray-600">
-            <p>&copy; 2025 足球博彩网站 版权所有</p>
-            <p>请理性投注，赌博成瘾请立即寻求帮助</p>
-        </div>
-    </footer>
-
-    <!-- 选中行处理脚本 -->
+    <!-- 底部预留的JavaScript逻辑 -->
     <script>
-        let selectedARow = null;
-        let selectedBRow = null;
-
+        // 示例：选中行处理函数（需根据实际逻辑完善）
         function selectRow(row, source) {
-            // 清除对应数据源的旧选中状态
-            if (source === 'a') {
-                if (selectedARow) {
-                    selectedARow.classList.remove('selected-row');
-                }
-                selectedARow = row;
-            } else {
-                if (selectedBRow) {
-                    selectedBRow.classList.remove('selected-row');
-                }
-                selectedBRow = row;
-            }
-            // 添加新选中状态
+            // 清除其他行的选中状态
+            document.querySelectorAll('.data-table tr').forEach(tr => {
+                tr.classList.remove('selected-row');
+            });
             row.classList.add('selected-row');
-            
-            // 激活添加绑定按钮（可根据需求扩展）
-            document.getElementById('addBindingBtn').disabled = false;
+            // 这里可以添加将选中行数据传递到绑定管理的逻辑
+            console.log(`选中${source}网数据行：`, row);
         }
 
-        // 示例：添加绑定按钮逻辑（可根据实际需求扩展）
-        document.getElementById('addBindingBtn').addEventListener('click', () => {
-            if (selectedARow && selectedBRow) {
-                // 此处可获取两行数据进行绑定操作
-                const aData = {
-                    time: selectedARow.cells[0].textContent,
-                    league: selectedARow.cells[1].textContent,
-                    home: selectedARow.cells[2].textContent,
-                    away: selectedARow.cells[3].textContent
-                };
-                const bData = {
-                    time: selectedBRow.cells[0].textContent,
-                    league: selectedBRow.cells[1].textContent,
-                    home: selectedBRow.cells[2].textContent,
-                    away: selectedBRow.cells[3].textContent
-                };
-                // 模拟生成绑定记录（实际需插入到DOM或调用API）
-                const newRecord = document.createElement('div');
-                newRecord.className = 'border rounded-lg p-5';
-                newRecord.innerHTML = `
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-sm font-medium text-gray-800">联赛对比</p>
-                            <span class="text-gray-600">A网：${aData.league} | B网：${bData.league}</span>
-                        </div>
-                        <div>
-                            <p class="text-sm font-medium text-gray-800">时间对比</p>
-                            <span class="text-gray-600">${aData.time} | ${bData.time}</span>
-                        </div>
-                    </div>
-                    <div class="mt-4">
-                        <p class="text-sm font-medium text-gray-800">球队对比</p>
-                        <div class="flex space-x-6">
-                            <div>
-                                <span class="block text-gray-600">主队：${aData.home}（A网） vs ${bData.home}（B网）</span>
-                            </div>
-                            <div>
-                                <span class="block text-gray-600">客队：${aData.away}（A网） vs ${bData.away}（B网）</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                document.getElementById('boundMatchesContainer').prepend(newRecord);
-                // 清除选中状态（可选）
-                selectedARow.classList.remove('selected-row');
-                selectedBRow.classList.remove('selected-row');
-                selectedARow = null;
-                selectedBRow = null;
-            }
+        // 相似度阈值滑动条更新
+        const precisionSlider = document.querySelector('input[type="range"]');
+        const precisionValue = document.getElementById('precisionValue');
+        precisionSlider.addEventListener('input', (e) => {
+            precisionValue.textContent = e.target.value;
         });
+
+        // 从接口获取数据并填充表格
+        async function fetchData(url, source, button) {
+            const loading = document.getElementById(`${source}-loading`);
+            const errorElement = document.getElementById(`${source}-error`);
+            loading.style.display = 'block';
+            button.disabled = true;
+            errorElement.textContent = '';
+
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`网络响应错误: ${response.status} ${response.statusText}`);
+                }
+                const data = await response.json();
+                console.log(`获取到的 ${source} 网数据:`, data);
+
+                const table = document.getElementById(`${source}-table`);
+                const tbody = table.getElementsByTagName('tbody')[0];
+                const countElement = document.getElementById(`${source}-count`);
+
+                if (typeof data.count === 'undefined') {
+                    throw new Error('响应数据中缺少 count 字段');
+                }
+                if (typeof data.fixtures === 'undefined') {
+                    throw new Error('响应数据中缺少 fixtures 字段');
+                }
+
+                countElement.textContent = `比赛数量：${data.count}`;
+                // 清空表格
+                tbody.innerHTML = '';
+
+                data.fixtures.forEach(fixture => {
+                    if (typeof fixture.time === 'undefined' || typeof fixture.league === 'undefined' || typeof fixture.home_team === 'undefined' || typeof fixture.away_team === 'undefined') {
+                        console.warn('比赛数据缺少必要字段:', fixture);
+                        return;
+                    }
+                    const row = tbody.insertRow();
+                    const timeCell = row.insertCell(0);
+                    const leagueCell = row.insertCell(1);
+                    const homeTeamCell = row.insertCell(2);
+                    const awayTeamCell = row.insertCell(3);
+                    timeCell.textContent = fixture.time;
+                    leagueCell.textContent = fixture.league;
+                    homeTeamCell.textContent = fixture.home_team;
+                    awayTeamCell.textContent = fixture.away_team;
+                    row.onclick = () => selectRow(row, source);
+                });
+            } catch (error) {
+                console.error(`获取数据时出错: ${error.message}`);
+                errorElement.textContent = `获取数据时出错: ${error.message}`;
+            } finally {
+                loading.style.display = 'none';
+                button.disabled = false;
+            }
+        }
     </script>
 </body>
 
-</html>
+</html>    
