@@ -27,13 +27,13 @@
         /* 加载动画样式 */
         .loading {
             display: none;
-            border: 4px solid rgba(0, 0, 0, 0.1);
+            border: 3px solid rgba(0, 0, 0, 0.1);
             border-left-color: #000;
             border-radius: 50%;
-            width: 20px;
-            height: 20px;
+            width: 15px;
+            height: 15px;
             animation: spin 1s linear infinite;
-            margin-left: 10px;
+            margin-left: 5px;
         }
 
         @keyframes spin {
@@ -45,46 +45,165 @@
         /* 错误提示样式 */
         .error-message {
             color: red;
-            font-size: 0.875rem;
-            margin-top: 0.5rem;
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
         }
 
         /* 数据篮子样式 */
-        .data-basket {
-            border: 1px solid #e2e8f0;
-            border-radius: 0.375rem;
-            padding: 1rem;
-            min-height: 10rem;
-            margin-bottom: 1rem;
+        .data-basket ul {
+            list-style-type: none;
+            padding: 0;
         }
 
-        .basket-item {
+        .data-basket li {
             background-color: #edf2f7;
             padding: 0.25rem 0.5rem;
             border-radius: 0.25rem;
-            margin: 0.25rem;
-            display: inline-block;
+            margin-bottom: 0.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             position: relative;
         }
 
-        .basket-item .remove-btn {
-            position: absolute;
-            top: -5px;
-            right: -5px;
+        .data-basket li .remove-btn {
             background-color: #e53e3e;
             color: white;
-            width: 16px;
-            height: 16px;
+            width: 15px;
+            height: 15px;
             border-radius: 50%;
             font-size: 10px;
             text-align: center;
-            line-height: 16px;
+            line-height: 15px;
             cursor: pointer;
-            display: none;
         }
 
-        .basket-item:hover .remove-btn {
+        /* 已绑定比赛信息栏样式 */
+        .bound-matches-info {
+            border: 1px solid #e2e8f0;
+            border-radius: 0.375rem;
+            padding: 1rem;
+            margin-top: 1rem;
+            height: auto;
+            min-height: 200px;
+            overflow-y: auto;
+            padding-right: 0.5rem; /* 防止滚动条遮挡内容 */
+            max-height: calc(3*(16rem + 1rem)); /* 左侧3个卡片总高度（h-64=16rem，每个间距mt-4=1rem） */
+        }
+
+        /* 调整左侧数据卡片高度 */
+        .h-64 { 
+            height: 16rem !important; /* 确保左侧高度统一 */
+        }
+
+        /* 统一按钮样式 */
+        .custom-btn {
+            background-color: #f9fafb;
+            border: 1px solid #d1d5db;
+            color: #374151;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+
+        .custom-btn:hover {
+            background-color: #f3f4f6;
+            border-color: #9ca3af;
+        }
+
+        .custom-btn:active {
+            background-color: #e5e7eb;
+            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+        }
+
+        /* 新增样式：绑定条目容器 */
+        .bound-item {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.25rem;
+            padding: 0.5rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.375rem;
+            margin-bottom: 1rem;
+            background-color: white;
+            min-height: 90px; /* 新增高度限制 */
+            position: relative; /* 为删除按钮定位 */
+            grid-template-columns: repeat(3, 1fr) 30px; /* 新增第四列用于按钮 */
+        }
+
+        .network-data div {
+            font-size: 0.75rem; /* 原无设置，默认约0.875rem */
+        }
+
+
+/* 删除按钮新样式 */
+.bound-item .delete-btn {
+    background: #e53e3e;
+    color: white;
+    width: 24px;
+    height: 100%; /* 高度充满容器 */
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: none;
+    transition: background 0.2s;
+    margin-left: auto; /* 右侧对齐 */
+}
+
+.bound-item .delete-btn:hover {
+    background: #c53030;
+}
+
+
+
+        .network-data {
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+        }
+
+        .network-data:nth-child(1) {
+            border-left: 3px solid #4B52F8;
+        }
+
+        .network-data:nth-child(2) {
+            border-left: 3px solid #2DD4BF;
+        }
+
+        .network-data:nth-child(3) {
+            border-left: 3px solid #F59E0B;
+        }
+
+        .network-label {
+            font-weight: 500;
+            color: #6B7280;
+            font-size: 0.875rem;
             display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        /* 选中状态样式优化 */
+        .selected-row {
+            background-color: rgba(75, 82, 248, 0.15);
+            border-left: 3px solid #4B52F8;
+            font-weight: 500;
+            box-shadow: inset 0 0 4px rgba(75, 82, 248, 0.2);
+        }
+
+        /* 按钮状态样式 */
+        #add-binding-btn {
+            background-color: #4B52F8;
+            color: white;
+            border: none;
+            font-weight: 600;
+        }
+
+        #add-binding-btn:disabled {
+            background-color: #e5e7eb;
+            color: #6B7280;
+            cursor: not-allowed;
         }
     </style>
 </head>
@@ -109,28 +228,28 @@
     </nav>
 
     <!-- 主内容区 -->
-    <div class="container mx-auto px-6 py-8 grid grid-cols-12 gap-6">
+    <div class="container mx-auto px-4 py-6 grid grid-cols-12 gap-4">
         <!-- 左侧数据源区域（占8列） -->
-        <div class="col-span-12 lg:col-span-8">
+        <div class="col-span-12 lg:col-span-6">
             <!-- 1网数据卡片 -->
-            <div class="bg-white shadow-lg rounded-lg p-6">
-                <div class="flex justify-between items-start mb-6">
+            <div class="bg-white shadow-lg rounded-lg p-4">
+                <div class="flex justify-between items-start mb-4">
                     <div>
                         <h3 class="text-lg font-bold text-gray-800">1网数据</h3>
-                        <p class="text-sm text-gray-500">实时更新的赛事数据</p>
-                        <p class="text-sm text-gray-500" id="a-count">比赛数量：0</p>
+                        <p class="text-xs text-gray-500" id="a-count">比赛数量：0</p>
                         <p class="error-message" id="a-error"></p>
                     </div>
                     <!-- 操作按钮区 -->
-                    <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-2">
                         <!-- 搜索框 -->
                         <div class="relative">
                             <input type="text" data-source="a" placeholder="搜索联赛/球队/时间"
-                                class="border border-gray-300 rounded-lg px-4 py-2 w-80 focus:outline-none focus:border-blue-600">
+                                class="border border-gray-300 rounded-lg px-2 py-1 w-64 focus:outline-none focus:border-blue-600 text-xs">
                         </div>
                         <!-- 功能按钮 -->
-                        <div class="flex items-center space-x-2">
-                            <button class="bg-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300" onclick="fetchData('http://localhost:6001/today_fixtures', 'a', this)">
+                        <div class="flex items-center space-x-1">
+                            <!-- 刷新按钮统一为 custom-btn 样式（保留原有灰色基调） -->
+                            <button class="custom-btn text-xs" onclick="fetchData('http://localhost:6001/today_fixtures', 'a', this)">
                                 刷新
                             </button>
                             <div class="loading" id="a-loading"></div>
@@ -138,14 +257,14 @@
                     </div>
                 </div>
                 <!-- 数据表格 -->
-                <div class="h-80 overflow-y-auto">
-                    <table class="w-full data-table" id="a-table">
+                <div class="h-64 overflow-y-auto">
+                    <table class="w-full data-table text-xs" id="a-table">
                         <thead>
                             <tr class="bg-gray-100">
-                                <th class="px-4 py-3 text-sm font-medium text-gray-700 text-left">比赛时间</th>
-                                <th class="px-4 py-3 text-sm font-medium text-gray-700 text-left">联赛</th>
-                                <th class="px-4 py-3 text-sm font-medium text-gray-700 text-left">主队</th>
-                                <th class="px-4 py-3 text-sm font-medium text-gray-700 text-left">客队</th>
+                                <th class="px-2 py-1 text-left">比赛时间</th>
+                                <th class="px-2 py-1 text-left">联赛</th>
+                                <th class="px-2 py-1 text-left">主队</th>
+                                <th class="px-2 py-1 text-left">客队</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -155,24 +274,23 @@
             </div>
 
             <!-- 2网数据卡片 -->
-            <div class="bg-white shadow-lg rounded-lg p-6 mt-8">
-                <div class="flex justify-between items-start mb-6">
+            <div class="bg-white shadow-lg rounded-lg p-4 mt-4">
+                <div class="flex justify-between items-start mb-4">
                     <div>
                         <h3 class="text-lg font-bold text-gray-800">2网数据</h3>
-                        <p class="text-sm text-gray-500">实时更新的赛事数据</p>
-                        <p class="text-sm text-gray-500" id="b-count">比赛数量：0</p>
+                        <p class="text-xs text-gray-500" id="b-count">比赛数量：0</p>
                         <p class="error-message" id="b-error"></p>
                     </div>
                     <!-- 操作按钮区 -->
-                    <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-2">
                         <!-- 搜索框 -->
                         <div class="relative">
                             <input type="text" data-source="b" placeholder="搜索联赛/球队/时间"
-                                class="border border-gray-300 rounded-lg px-4 py-2 w-80 focus:outline-none focus:border-blue-600">
+                                class="border border-gray-300 rounded-lg px-2 py-1 w-64 focus:outline-none focus:border-blue-600 text-xs">
                         </div>
                         <!-- 功能按钮 -->
-                        <div class="flex items-center space-x-2">
-                            <button class="bg-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300" onclick="fetchData('http://localhost:6002/matches', 'b', this)">
+                        <div class="flex items-center space-x-1">
+                            <button class="custom-btn text-xs" onclick="fetchData('http://localhost:6002/matches', 'b', this)">
                                 刷新
                             </button>
                             <div class="loading" id="b-loading"></div>
@@ -180,14 +298,14 @@
                     </div>
                 </div>
                 <!-- 数据表格 -->
-                <div class="h-80 overflow-y-auto">
-                    <table class="w-full data-table" id="b-table">
+                <div class="h-64 overflow-y-auto">
+                    <table class="w-full data-table text-xs" id="b-table">
                         <thead>
                             <tr class="bg-gray-100">
-                                <th class="px-4 py-3 text-sm font-medium text-gray-700 text-left">比赛时间</th>
-                                <th class="px-4 py-3 text-sm font-medium text-gray-700 text-left">联赛</th>
-                                <th class="px-4 py-3 text-sm font-medium text-gray-700 text-left">主队</th>
-                                <th class="px-4 py-3 text-sm font-medium text-gray-700 text-left">客队</th>
+                                <th class="px-2 py-1 text-left">比赛时间</th>
+                                <th class="px-2 py-1 text-left">联赛</th>
+                                <th class="px-2 py-1 text-left">主队</th>
+                                <th class="px-2 py-1 text-left">客队</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -197,24 +315,23 @@
             </div>
 
             <!-- 3网数据卡片 -->
-            <div class="bg-white shadow-lg rounded-lg p-6 mt-8">
-                <div class="flex justify-between items-start mb-6">
+            <div class="bg-white shadow-lg rounded-lg p-4 mt-4">
+                <div class="flex justify-between items-start mb-4">
                     <div>
                         <h3 class="text-lg font-bold text-gray-800">3网数据</h3>
-                        <p class="text-sm text-gray-500">实时更新的赛事数据</p>
-                        <p class="text-sm text-gray-500" id="c-count">比赛数量：0</p>
+                        <p class="text-xs text-gray-500" id="c-count">比赛数量：0</p>
                         <p class="error-message" id="c-error"></p>
                     </div>
                     <!-- 操作按钮区 -->
-                    <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-2">
                         <!-- 搜索框 -->
                         <div class="relative">
                             <input type="text" data-source="c" placeholder="搜索联赛/球队/时间"
-                                class="border border-gray-300 rounded-lg px-4 py-2 w-80 focus:outline-none focus:border-blue-600">
+                                class="border border-gray-300 rounded-lg px-2 py-1 w-64 focus:outline-none focus:border-blue-600 text-xs">
                         </div>
                         <!-- 功能按钮 -->
-                        <div class="flex items-center space-x-2">
-                            <button class="bg-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300" onclick="fetchData('http://localhost:6003/get_soccer_events', 'c', this)">
+                        <div class="flex items-center space-x-1">
+                            <button class="custom-btn text-xs" onclick="fetchData('http://localhost:6003/get_soccer_events', 'c', this)">
                                 刷新
                             </button>
                             <div class="loading" id="c-loading"></div>
@@ -222,14 +339,14 @@
                     </div>
                 </div>
                 <!-- 数据表格 -->
-                <div class="h-80 overflow-y-auto">
-                    <table class="w-full data-table" id="c-table">
+                <div class="h-64 overflow-y-auto">
+                    <table class="w-full data-table text-xs" id="c-table">
                         <thead>
                             <tr class="bg-gray-100">
-                                <th class="px-4 py-3 text-sm font-medium text-gray-700 text-left">比赛时间</th>
-                                <th class="px-4 py-3 text-sm font-medium text-gray-700 text-left">联赛</th>
-                                <th class="px-4 py-3 text-sm font-medium text-gray-700 text-left">主队</th>
-                                <th class="px-4 py-3 text-sm font-medium text-gray-700 text-left">客队</th>
+                                <th class="px-2 py-1 text-left">比赛时间</th>
+                                <th class="px-2 py-1 text-left">联赛</th>
+                                <th class="px-2 py-1 text-left">主队</th>
+                                <th class="px-2 py-1 text-left">客队</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -239,48 +356,21 @@
             </div>
         </div>
 
-        <!-- 右侧绑定管理区域（占4列） -->
-        <div class="col-span-12 lg:col-span-4">
-            <!-- 绑定操作区 -->
-            <div class="bg-white shadow-lg rounded-lg p-6">
-                <h4 class="text-base font-bold text-gray-800 mb-6">绑定操作面板</h4>
-
-                <!-- 联赛数据篮子 -->
-                <div class="data-basket">
-                    <h5 class="text-sm font-medium text-gray-700 mb-2">联赛名称篮子</h5>
-                    <div id="league-basket"></div>
+        <!-- 右侧新区域 -->
+        <div class="col-span-12 lg:col-span-6">
+            <div class="bg-white shadow-lg rounded-lg p-4">
+                <h4 class="text-base font-bold text-gray-800 mb-4">已绑定比赛管理</h4>
+                <div class="flex flex-wrap justify-end -mx-2 mb-4">
+                    <!-- 所有右侧按钮统一为 custom-btn 样式，移除原 Tailwind 颜色类 -->
+                    <button id="add-binding-btn" class="custom-btn m-2 disabled" disabled>
+                        添加绑定 <i class="fas fa-plus ml-1"></i>
+                    </button>
+                    <button class="custom-btn m-2">模糊绑定</button>
+                    <button class="custom-btn m-2" style="color: green;">提交</button>
+                    <button class="custom-btn m-2" style="color: #e53e3e;">清空</button>
                 </div>
-
-                <!-- 队伍数据篮子 -->
-                <div class="data-basket">
-                    <h5 class="text-sm font-medium text-gray-700 mb-2">队伍名称篮子</h5>
-                    <div id="team-basket"></div>
-                </div>
-
-                <!-- 绑定功能按钮 -->
-                <div class="flex flex-col space-y-4">
-                    <button 
-                        id="bind-league" 
-                        class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50"
-                        disabled
-                    >
-                        绑定联赛对应关系
-                    </button>
-
-                    <button 
-                        id="bind-team" 
-                        class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 disabled:opacity-50"
-                        disabled
-                    >
-                        绑定队伍对应关系
-                    </button>
-
-                    <button 
-                        id="submit-binding" 
-                        class="bg-yellow-600 text-white px-6 py-2 rounded-lg hover:bg-yellow-700 mt-4"
-                    >
-                        提交绑定数据到服务器
-                    </button>
+                <div class="bound-matches-info" id="bound-matches-container">
+                    <!-- 这里后续可添加比赛信息 -->
                 </div>
             </div>
         </div>
@@ -288,85 +378,46 @@
 
     <!-- 底部预留的JavaScript逻辑 -->
     <script>
-        // 存储各数据源的原始数据和DOM引用
+        // 新增：存储各数据源选中的比赛
+        const selectedFixtures = { a: null, b: null, c: null };
+
+        // 初始化数据源配置
         const dataSources = {
+            a: { tableId: 'a-table', source: 'a', color: '#4B52F8' },
+            b: { tableId: 'b-table', source: 'b', color: '#2DD4BF' },
+            c: { tableId: 'c-table', source: 'c', color: '#F59E0B' },
+        };
+
+        // 存储各数据源的原始数据和DOM引用
+        const dataSourcesData = {
             a: { fixtures: [], table: null, searchInput: null },
             b: { fixtures: [], table: null, searchInput: null },
             c: { fixtures: [], table: null, searchInput: null }
         };
 
-        const leagueBasket = document.getElementById('league-basket');
-        const teamBasket = document.getElementById('team-basket');
-        const bindLeagueBtn = document.getElementById('bind-league');
-        const bindTeamBtn = document.getElementById('bind-team');
-        const selectedSources = { a: false, b: false, c: false };
-
-        // 选中行处理函数
+        // 找到清空按钮并添加点击事件
+        document.querySelector('button.custom-btn[style*="color: #e53e3e;"]').addEventListener('click', () => {
+            document.getElementById('bound-matches-container').innerHTML = '';
+        });
+        
+        // 选中行处理函数（优化版）
         function selectRow(row, source) {
-            // 清除其他行的选中状态
-            document.querySelectorAll('.data-table tr').forEach(tr => {
-                tr.classList.remove('selected-row');
-            });
+            // 清除当前数据源之前的选中
+            const prevSelected = document.querySelector(`#${dataSources[source].tableId} tr.selected-row`);
+            if (prevSelected) prevSelected.classList.remove('selected-row');
+
             row.classList.add('selected-row');
-
             const index = row.dataset.fixtureIndex;
-            const fixture = dataSources[source].fixtures[index];
+            selectedFixtures[source] = dataSourcesData[source].fixtures[index]; // 存储选中数据
 
-            // 先移除该数据源之前添加的数据
-            removeFromBasketBySource(source);
-
-            // 将联赛和队伍名称添加到数据篮子
-            addToBasket(leagueBasket, fixture.league, source);
-            addToBasket(teamBasket, fixture.home_team, source);
-            addToBasket(teamBasket, fixture.away_team, source);
-
-            selectedSources[source] = true;
-
-            // 检查数据篮子是否有数据，启用绑定按钮
-            if (leagueBasket.children.length > 0) {
-                bindLeagueBtn.disabled = false;
-            }
-            if (teamBasket.children.length > 0) {
-                bindTeamBtn.disabled = false;
-            }
-        }
-
-        // 添加到数据篮子的函数
-        function addToBasket(basket, item, source) {
-            const basketItem = document.createElement('div');
-            basketItem.classList.add('basket-item');
-            basketItem.textContent = `${source.toUpperCase()}网 - ${item}`;
-
-            const removeBtn = document.createElement('span');
-            removeBtn.classList.add('remove-btn');
-            removeBtn.textContent = '×';
-            removeBtn.addEventListener('click', () => {
-                basket.removeChild(basketItem);
-                // 检查数据篮子是否为空，禁用绑定按钮
-                if (leagueBasket.children.length === 0) {
-                    bindLeagueBtn.disabled = true;
-                }
-                if (teamBasket.children.length === 0) {
-                    bindTeamBtn.disabled = true;
-                }
-            });
-            basketItem.appendChild(removeBtn);
-            basket.appendChild(basketItem);
-        }
-
-        // 移除指定数据源的数据
-        function removeFromBasketBySource(source) {
-            const allItems = [...leagueBasket.children, ...teamBasket.children];
-            allItems.forEach(item => {
-                if (item.textContent.startsWith(source.toUpperCase() + '网 - ')) {
-                    item.parentElement.removeChild(item);
-                }
-            });
+            // 检查是否三网都已选中
+            const allSelected = Object.values(selectedFixtures).every(f => f);
+            document.getElementById('add-binding-btn').disabled = !allSelected;
         }
 
         // 通用搜索过滤函数
         function filterFixtures(source, keyword) {
-            const { fixtures, table } = dataSources[source];
+            const { fixtures, table } = dataSourcesData[source];
             const tbody = table.getElementsByTagName('tbody')[0];
             const rows = tbody.querySelectorAll('tr');
 
@@ -431,9 +482,9 @@
                 }
 
                 // 存储数据和DOM引用
-                dataSources[source].fixtures = data.fixtures;
-                dataSources[source].table = table;
-                dataSources[source].searchInput = searchInput;
+                dataSourcesData[source].fixtures = data.fixtures;
+                dataSourcesData[source].table = table;
+                dataSourcesData[source].searchInput = searchInput;
 
                 countElement.textContent = `比赛数量：${data.count}`;
                 // 清空表格
@@ -464,6 +515,49 @@
                 button.disabled = false;
             }
         }
+
+        // 添加绑定按钮点击事件
+        document.getElementById('add-binding-btn').addEventListener('click', () => {
+            const boundItem = document.createElement('div');
+            boundItem.className = 'bound-item';
+
+            // 生成三个网络的显示块
+            ['a', 'b', 'c'].forEach(source => {
+                const fixture = selectedFixtures[source];
+                const networkDiv = document.createElement('div');
+                networkDiv.className = `network-data bg-${source === 'a' ? 'blue' : source === 'b' ? 'green' : 'orange'}-50`;
+
+                networkDiv.innerHTML = `
+                    <div class="network-label">${
+                        source === 'a' ? '1' : 
+                        source === 'b' ? '2' : '3'
+                        }网数据</div>
+                    <div>联赛：${fixture.league}</div>
+                    <div>主队：${fixture.home_team}</div>
+                    <div>客队：${fixture.away_team}</div>
+                    <div>时间：${fixture.time}</div>
+                `;
+
+                boundItem.appendChild(networkDiv);
+            });
+
+            // 添加删除功能
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'delete-btn'; // 使用新定义的样式类
+            deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
+            deleteBtn.onclick = () => boundItem.remove();
+            boundItem.appendChild(deleteBtn);
+
+            document.getElementById('bound-matches-container').prepend(boundItem);
+
+            // 清除选中状态
+            Object.keys(selectedFixtures).forEach(source => {
+                selectedFixtures[source] = null;
+                const table = dataSourcesData[source].table;
+                table.querySelectorAll('tr').forEach(tr => tr.classList.remove('selected-row'));
+            });
+            document.getElementById('add-binding-btn').disabled = true;
+        });
 
         // 初始化搜索框监听
         document.addEventListener('DOMContentLoaded', () => {
