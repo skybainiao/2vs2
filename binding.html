@@ -568,8 +568,56 @@
                 }, 300)); // 300ms防抖延迟
             });
         });
+
+// 提交按钮点击事件
+document.querySelector('button.custom-btn[style="color: green;"]').addEventListener('click', async () => {
+    const boundItems = document.querySelectorAll('.bound-item');
+    const requests = [];
+
+    boundItems.forEach(item => {
+        const request = { 
+            source1: parseSourceData(item, 0),
+            source2: parseSourceData(item, 1),
+            source3: parseSourceData(item, 2)
+        };
+        requests.push(request);
+    });
+
+    try {
+        const response = await fetch('http://localhost:8080/api/bindings', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requests),
+        });
+
+        if (!response.ok) {
+            throw new Error(`提交失败: ${response.statusText}`);
+        }
+        alert('提交成功！');
+    } catch (error) {
+        console.error('提交错误:', error);
+        alert(`提交失败: ${error.message}`);
+    }
+});
+
+// 解析DOM数据的方法
+function parseSourceData(item, index) {
+    const sourceDiv = item.querySelectorAll('.network-data')[index];
+  
+    
+    return {
+        leagueName: sourceDiv.children[1].textContent.split('：')[1],
+        homeTeam: sourceDiv.children[2].textContent.split('：')[1],
+        awayTeam: sourceDiv.children[3].textContent.split('：')[1],
+         
+        source: index + 1
+    };
+}
+
+ 
     </script>
 </body>
 
 </html>
-    
