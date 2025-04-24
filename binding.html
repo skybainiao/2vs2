@@ -210,6 +210,29 @@
     display: inline-block;
     margin-left: 8px;
 }
+
+/* 重复数据红色标记 */
+.duplicate-text {
+    color: #ef4444 !important;
+    position: relative;
+    font-weight: 500;
+}
+
+/* 鼠标悬停时显示提示 */
+.duplicate-text:hover::after {
+    content: "已存在重复记录";
+    position: absolute;
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 10;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+}
     </style>
 </head>
 
@@ -227,7 +250,7 @@
             </div>
             <div class="flex space-x-2">
                 <a href="#" class="text-gray-700 hover:text-blue-600">登录</a>
-                <a href="#" class="text-gray-700 hover:text-blue-600">注册</a>
+                 
             </div>
         </div>
     </nav>
@@ -370,7 +393,7 @@
                     <button id="add-binding-btn" class="custom-btn m-2 disabled" disabled>
                         添加绑定 <i class="fas fa-plus ml-1"></i>
                     </button>
-                    <button class="custom-btn m-2">模糊绑定</button>
+                    <button class="custom-btn m-2">快速绑定</button>
                     <!-- 修改后 -->
 <button class="custom-btn m-2" style="color: green;" id="submit-btn">
     提交
@@ -464,68 +487,115 @@
             };
         }
 
-        // 从接口获取数据并填充表格
-        async function fetchData(url, source, button) {
-            const loading = document.getElementById(`${source}-loading`);
-            const errorElement = document.getElementById(`${source}-error`);
-            loading.style.display = 'block';
-            button.disabled = true;
-            errorElement.textContent = '';
+    // 从接口获取数据并填充表格（完整修复版）
+async function fetchData(url, source, button) {
+    const loading = document.getElementById(`${source}-loading`);
+    const errorElement = document.getElementById(`${source}-error`);
+    loading.style.display = 'block';
+    button.disabled = true;
+    errorElement.textContent = '';
 
-            try {
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error(`网络响应错误: ${response.status} ${response.statusText}`);
-                }
-                const data = await response.json();
-                console.log(`获取到的 ${source} 网数据:`, data);
-
-                const table = document.getElementById(`${source}-table`);
-                const tbody = table.getElementsByTagName('tbody')[0];
-                const countElement = document.getElementById(`${source}-count`);
-                const searchInput = document.querySelector(`[data-source="${source}"] input`); // 获取搜索框
-
-                if (typeof data.count === 'undefined') {
-                    throw new Error('响应数据中缺少 count 字段');
-                }
-                if (typeof data.fixtures === 'undefined') {
-                    throw new Error('响应数据中缺少 fixtures 字段');
-                }
-
-                // 存储数据和DOM引用
-                dataSourcesData[source].fixtures = data.fixtures;
-                dataSourcesData[source].table = table;
-                dataSourcesData[source].searchInput = searchInput;
-
-                countElement.textContent = `比赛数量：${data.count}`;
-                // 清空表格
-                tbody.innerHTML = '';
-
-                data.fixtures.forEach((fixture, index) => {
-                    if (!fixture.time || !fixture.league || !fixture.home_team || !fixture.away_team) {
-                        console.warn('比赛数据缺少必要字段:', fixture);
-                        return;
-                    }
-                    const row = tbody.insertRow();
-                    const timeCell = row.insertCell(0);
-                    const leagueCell = row.insertCell(1);
-                    const homeTeamCell = row.insertCell(2);
-                    const awayTeamCell = row.insertCell(3);
-                    timeCell.textContent = fixture.time;
-                    leagueCell.textContent = fixture.league;
-                    homeTeamCell.textContent = fixture.home_team;
-                    awayTeamCell.textContent = fixture.away_team;
-                    row.dataset.fixtureIndex = index; // 存储数据索引
-                    row.onclick = () => selectRow(row, source);
-                });
-            } catch (error) {
-                console.error(`获取数据时出错: ${error.message}`);
-                errorElement.textContent = `获取数据时出错: ${error.message}`;
-            } finally {
-                loading.style.display = 'none';
-                button.disabled = false;
-            }
+    try {
+        // 步骤1：获取原始数据
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`网络响应错误: ${response.status} ${response.statusText}`);
         }
+        const data = await response.json();
+        console.log(`获取到的 ${source} 网数据:`, data);
+
+        // 步骤2：验证数据结构
+        if (typeof data.count === 'undefined' || typeof data.fixtures === 'undefined') {
+            throw new Error('响应数据格式错误');
+        }
+
+        // 步骤3：发送重复检查请求
+        const sourceNumber = source === 'a' ? 1 : source === 'b' ? 2 : 3;
+        const checkResponse = await fetch('http://localhost:8080/api/bindings/check-duplicates', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                source: sourceNumber,
+                matches: data.fixtures.map(f => ({
+                    league: f.league,
+                    homeTeam: f.home_team,
+                    awayTeam: f.away_team
+                }))
+            })
+        });
+
+        if (!checkResponse.ok) {
+            throw new Error('重复检查请求失败');
+        }
+
+        // 步骤4：处理重复数据（修复关键点）
+        const duplicates = await checkResponse.json();
+        
+        // 转换数组为Set
+        const leaguesSet = new Set(duplicates.leagues || []);
+        const teamsSet = new Set(duplicates.teams || []);
+
+        // 过滤逻辑
+        const filteredFixtures = data.fixtures.filter(fixture => {
+            const isLeagueExist = leaguesSet.has(fixture.league);
+            const isHomeExist = teamsSet.has(fixture.home_team);
+            const isAwayExist = teamsSet.has(fixture.away_team);
+            return !(isLeagueExist && isHomeExist && isAwayExist);
+        });
+
+        // 步骤5：更新DOM元素引用
+        const table = document.getElementById(`${source}-table`);
+        const tbody = table.getElementsByTagName('tbody')[0];
+        const countElement = document.getElementById(`${source}-count`);
+        const searchInput = document.querySelector(`[data-source="${source}"] input`);
+
+        // 步骤6：清空并重新填充表格
+        tbody.innerHTML = '';
+        filteredFixtures.forEach((fixture, index) => {
+            if (!fixture.time || !fixture.league || !fixture.home_team || !fixture.away_team) {
+                console.warn('无效的比赛数据:', fixture);
+                return;
+            }
+
+            const row = tbody.insertRow();
+            row.dataset.fixtureIndex = index;
+
+            // 创建带重复标记的单元格（使用转换后的Set）
+            const createCell = (value, isDuplicate) => {
+                const cell = row.insertCell();
+                cell.textContent = value;
+                if (isDuplicate) cell.classList.add('duplicate-text');
+            };
+
+            // 填充数据
+            createCell(fixture.time, false);
+            createCell(fixture.league, leaguesSet.has(fixture.league));
+            createCell(fixture.home_team, teamsSet.has(fixture.home_team));
+            createCell(fixture.away_team, teamsSet.has(fixture.away_team));
+
+            // 保留点击事件
+            row.onclick = () => selectRow(row, source);
+        });
+
+        // 步骤7：更新数据存储
+        dataSourcesData[source] = {
+            fixtures: filteredFixtures,
+            table: table,
+            searchInput: searchInput
+        };
+
+        // 更新计数器
+        countElement.textContent = `比赛数量：${filteredFixtures.length}`;
+
+    } catch (error) {
+        console.error(`操作失败: ${error.message}`);
+        errorElement.textContent = `错误: ${error.message.replace(/^Error: /, '')}`;
+    } finally {
+        loading.style.display = 'none';
+        button.disabled = false;
+    }
+}
+
 
         // 添加绑定按钮点击事件
         document.getElementById('add-binding-btn').addEventListener('click', () => {
