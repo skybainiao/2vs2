@@ -233,6 +233,15 @@
     left: 50%;
     transform: translateX(-50%);
 }
+
+/* 新增快速绑定加载状态 */
+.quickbind-loading {
+        display: inline-block;
+        margin-left: 8px;
+        animation: spin 1s linear infinite;
+    }
+
+    
     </style>
 </head>
 
@@ -393,7 +402,7 @@
                     <button id="add-binding-btn" class="custom-btn m-2 disabled" disabled>
                         添加绑定 <i class="fas fa-plus ml-1"></i>
                     </button>
-                    <button class="custom-btn m-2">快速绑定</button>
+                    <button class="custom-btn m-2" id="quick-bind-btn">快速绑定</button>
                     <!-- 修改后 -->
 <button class="custom-btn m-2" style="color: green;" id="submit-btn">
     提交
@@ -412,27 +421,54 @@
 
     <!-- 底部预留的JavaScript逻辑 -->
     <script>
-        // 新增：存储各数据源选中的比赛
-        const selectedFixtures = { a: null, b: null, c: null };
 
-        // 初始化数据源配置
-        const dataSources = {
-            a: { tableId: 'a-table', source: 'a', color: '#4B52F8' },
-            b: { tableId: 'b-table', source: 'b', color: '#2DD4BF' },
-            c: { tableId: 'c-table', source: 'c', color: '#F59E0B' },
-        };
+        
+        // 必须最先定义的绑定管理器
+    const bindingManager = {
+        usedMatches: new Set(),
+        
+        isBound(source, match) {
+            return this.usedMatches.has(`${source}-${match.league}-${match.home_team}-${match.away_team}`);
+        },
+        
+        addBinding(source, match) {
+            this.usedMatches.add(`${source}-${match.league}-${match.home_team}-${match.away_team}`);
+        },
+        
+        removeBinding(source, match) {
+            this.usedMatches.delete(`${source}-${match.league}-${match.home_team}-${match.away_team}`);
+        },
+        
+        clear() {
+            this.usedMatches.clear();
+        }
+    };
 
-        // 存储各数据源的原始数据和DOM引用
-        const dataSourcesData = {
-            a: { fixtures: [], table: null, searchInput: null },
-            b: { fixtures: [], table: null, searchInput: null },
-            c: { fixtures: [], table: null, searchInput: null }
-        };
+    // 原数据结构和初始化
+    const selectedFixtures = { a: null, b: null, c: null };
+    const dataSources = {
+        a: { tableId: 'a-table', source: 'a', color: '#4B52F8' },
+        b: { tableId: 'b-table', source: 'b', color: '#2DD4BF' },
+        c: { tableId: 'c-table', source: 'c', color: '#F59E0B' },
+    };
+    let dataSourcesData = {
+        a: { fixtures: [], table: null, searchInput: null },
+        b: { fixtures: [], table: null, searchInput: null },
+        c: { fixtures: [], table: null, searchInput: null }
+    };
 
-        // 找到清空按钮并添加点击事件
-        document.querySelector('button.custom-btn[style*="color: #e53e3e;"]').addEventListener('click', () => {
-            document.getElementById('bound-matches-container').innerHTML = '';
+    // 强化清空功能
+document.querySelector('button.custom-btn[style*="color: #e53e3e;"]').addEventListener('click', () => {
+    document.getElementById('bound-matches-container').innerHTML = '';
+    bindingManager.clear();
+    ['a', 'b', 'c'].forEach(source => {
+        dataSourcesData[source].fixtures.forEach(match => {
+            match.isBound = false;
         });
+        const table = dataSourcesData[source].table;
+        if (table) updateTable(source);
+    });
+});
         
         // 选中行处理函数（优化版）
         function selectRow(row, source) {
@@ -765,6 +801,193 @@ document.querySelector('button.custom-btn[style="color: green;"]').addEventListe
 });
 
 
+  
+ 
+
+// 新增单词分割函数
+const splitWords = (str) => {
+    return str.toLowerCase()
+        .split(/[^\w\u4e00-\u9fa5]+/) // 分割单词（保留中文和字母数字）
+        .filter(word => word.length > 1); // 过滤单字符
+};
+
+// 完整快速绑定函数
+async function quickBind() {
+    const $btn = document.getElementById('quick-bind-btn');
+    if (!$btn) return;
+
+    try {
+        // 禁用按钮并显示加载状态
+        $btn.disabled = true;
+        $btn.innerHTML = '处理中 <i class="fas fa-spinner fa-spin"></i>';
+
+        // 准备数据：为每个比赛创建单词索引
+        const prepareMatches = (source) => {
+            return dataSourcesData[source].fixtures
+                .filter(f => !bindingManager.isBound(source, f)) // 过滤已绑定
+                .map(match => ({
+                    raw: match, // 保留原始数据引用
+                    source: source,
+                    time: match.time,
+                    leagueWords: new Set(splitWords(match.league)),
+                    homeWords: new Set(splitWords(match.home_team)),
+                    awayWords: new Set(splitWords(match.away_team))
+                }));
+        };
+
+        // 获取三个数据源的预处理数据
+        const aMatches = prepareMatches('a');
+        const bMatches = prepareMatches('b');
+        const cMatches = prepareMatches('c');
+
+        const validCombinations = [];
+
+        // 主匹配逻辑（三重循环）
+        for (const aMatch of aMatches) {
+            for (const bMatch of bMatches) {
+                // 第一阶段：AB匹配检查
+                // 1. 时间必须一致
+                if (aMatch.time !== bMatch.time) continue;
+                
+                // 2. 联赛字段至少一个共同词
+                const hasLeagueMatchAB = [...aMatch.leagueWords].some(w => bMatch.leagueWords.has(w));
+                // 3. 主队字段至少一个共同词
+                const hasHomeMatchAB = [...aMatch.homeWords].some(w => bMatch.homeWords.has(w));
+                // 4. 客队字段至少一个共同词
+                const hasAwayMatchAB = [...aMatch.awayWords].some(w => bMatch.awayWords.has(w));
+                
+                if (!hasLeagueMatchAB || !hasHomeMatchAB || !hasAwayMatchAB) continue;
+
+                // 第二阶段：寻找匹配的C网数据
+                for (const cMatch of cMatches) {
+                    // 1. 时间必须三方一致
+                    if (aMatch.time !== cMatch.time) continue;
+
+                    // 2. 检查AC匹配
+                    const hasLeagueMatchAC = [...aMatch.leagueWords].some(w => cMatch.leagueWords.has(w));
+                    const hasHomeMatchAC = [...aMatch.homeWords].some(w => cMatch.homeWords.has(w));
+                    const hasAwayMatchAC = [...aMatch.awayWords].some(w => cMatch.awayWords.has(w));
+                    const isACValid = hasLeagueMatchAC && hasHomeMatchAC && hasAwayMatchAC;
+
+                    // 3. 检查BC匹配
+                    const hasLeagueMatchBC = [...bMatch.leagueWords].some(w => cMatch.leagueWords.has(w));
+                    const hasHomeMatchBC = [...bMatch.homeWords].some(w => cMatch.homeWords.has(w));
+                    const hasAwayMatchBC = [...bMatch.awayWords].some(w => cMatch.awayWords.has(w));
+                    const isBCValid = hasLeagueMatchBC && hasHomeMatchBC && hasAwayMatchBC;
+
+                    // 最终匹配条件：AC或BC完全匹配
+                    if (isACValid || isBCValid) {
+                        // 检查是否已绑定
+                        const isUsed = [aMatch, bMatch, cMatch].some(m => 
+                            bindingManager.isBound(m.source, m.raw)
+                        );
+                        if (isUsed) continue;
+
+                        // 记录有效组合
+                        validCombinations.push({
+                            a: aMatch.raw,
+                            b: bMatch.raw,
+                            c: cMatch.raw
+                        });
+
+                        // 标记为已绑定
+                        bindingManager.addBinding('a', aMatch.raw);
+                        bindingManager.addBinding('b', bMatch.raw);
+                        bindingManager.addBinding('c', cMatch.raw);
+                    }
+                }
+            }
+        }
+
+        // 添加绑定条目到界面
+        if (validCombinations.length > 0) {
+            validCombinations.forEach(combo => {
+                const boundItem = document.createElement('div');
+                boundItem.className = 'bound-item';
+
+                // 添加三个数据源显示
+                [combo.a, combo.b, combo.c].forEach((match, index) => {
+                    const source = ['a', 'b', 'c'][index];
+                    const div = document.createElement('div');
+                    div.className = `network-data bg-${{
+                        a: 'blue', b: 'green', c: 'orange'
+                    }[source]}-50 p-2 rounded`;
+                    
+                    div.innerHTML = `
+                        <div class="network-label font-bold">${index+1}网数据</div>
+                        <div class="text-sm">联赛：${match.league}</div>
+                        <div class="text-sm">主队：${match.home_team}</div>
+                        <div class="text-sm">客队：${match.away_team}</div>
+                        <div class="text-xs text-gray-500">时间：${match.time}</div>
+                    `;
+                    
+                    boundItem.appendChild(div);
+                });
+
+                // 添加删除按钮
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'delete-btn hover:bg-red-700 transition-colors';
+                deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+                deleteBtn.onclick = () => {
+                    // 解除绑定状态
+                    bindingManager.removeBinding('a', combo.a);
+                    bindingManager.removeBinding('b', combo.b);
+                    bindingManager.removeBinding('c', combo.c);
+                    
+                    // 更新原始数据状态
+                    ['a', 'b', 'c'].forEach(source => {
+                        const match = combo[source];
+                        const original = dataSourcesData[source].fixtures.find(f => 
+                            f.league === match.league &&
+                            f.home_team === match.home_team &&
+                            f.away_team === match.away_team
+                        );
+                        if (original) original.isBound = false;
+                        updateTable(source);
+                    });
+
+                    boundItem.remove();
+                };
+                
+                boundItem.appendChild(deleteBtn);
+                document.getElementById('bound-matches-container').appendChild(boundItem);
+            });
+
+            alert(`成功添加 ${validCombinations.length} 组绑定！`);
+        } else {
+            alert('⚠️ 未找到符合要求的匹配组合');
+        }
+
+    } catch (error) {
+        console.error('快速绑定失败:', error);
+        alert(`操作失败：${error.message}`);
+    } finally {
+        // 恢复按钮状态
+        $btn.disabled = false;
+        $btn.innerHTML = '快速绑定';
+    }
+}
+
+// 初始化代码（必须放在DOM加载后！）
+document.addEventListener('DOMContentLoaded', () => {
+    // 确保按钮存在
+    const quickBindBtn = document.getElementById('quick-bind-btn');
+    if (!quickBindBtn) {
+        console.error('快速绑定按钮未找到，请检查HTML中的按钮ID');
+        return;
+    }
+
+    // 绑定事件
+    quickBindBtn.addEventListener('click', quickBind);
+    
+    // 初始化数据源引用
+    dataSourcesData = {
+        a: { fixtures: [], table: document.getElementById('a-table') },
+        b: { fixtures: [], table: document.getElementById('b-table') },
+        c: { fixtures: [], table: document.getElementById('c-table') }
+    };
+});
+
 // 增强型parseSourceData函数
 function parseSourceData(item, index) {
     try {
@@ -787,7 +1010,6 @@ function parseSourceData(item, index) {
         return null;
     }
 }
-
  
     </script>
 </body>
