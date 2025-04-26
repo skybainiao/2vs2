@@ -11,52 +11,73 @@
         .binding-card {
             transition: all 0.3s ease;
         }
-        
+
         .binding-card:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
 
-        .source-1 { border-left: 4px solid #4B52F8; }
-        .source-2 { border-left: 4px solid #2DD4BF; }
-        .source-3 { border-left: 4px solid #F59E0B; }
+        .source-1 {
+            border-left: 4px solid #4B52F8;
+        }
 
-        /* 新增样式 */
+        .source-2 {
+            border-left: 4px solid #2DD4BF;
+        }
+
+        .source-3 {
+            border-left: 4px solid #F59E0B;
+        }
+
         .league-title {
             @apply text-xl font-semibold flex items-center;
         }
+
         .league-badge {
             @apply text-xs px-2 py-1 rounded-full mr-2;
             background: rgba(75, 82, 248, 0.1);
             color: #4B52F8;
         }
+
         .team-section-title {
             @apply text-sm text-gray-500 font-medium mb-2 pt-2 border-t border-gray-100;
         }
+
         .team-item {
-            @apply text-sm p-2 hover:bg-gray-50 rounded text-gray-700;
+            @apply text-sm p-2 hover:bg-gray-50 rounded text-gray-700 relative;
         }
-        /* 新增折叠样式 */
+
         .league-header {
             @apply cursor-pointer flex items-center justify-between;
             transition: all 0.3s ease;
         }
+
         .collapse-icon {
             @apply transform transition-transform duration-200;
         }
+
         .collapsed .collapse-icon {
             transform: rotate(-90deg);
         }
+
         .team-list {
             overflow: hidden;
             transition: all 0.3s ease;
             max-height: 500px;
         }
+
         .collapsed .team-list {
             max-height: 0;
         }
 
+        /* 新增删除按钮样式 */
+        .delete-btn {
+            @apply absolute right-2 top-1/2 -translate-y-1/2 opacity-0 transition-opacity;
+        }
 
+        .team-item:hover .delete-btn {
+            opacity: 1;
+        }
     </style>
 </head>
 
@@ -85,9 +106,9 @@
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 space-y-4 md:space-y-0">
                 <h2 class="text-2xl font-bold text-gray-800">绑定记录列表</h2>
                 <div class="w-full md:w-64 relative">
-                    <input type="text" id="searchInput" 
-                           class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                           placeholder="搜索联赛或球队...">
+                    <input type="text" id="searchInput"
+                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="搜索联赛或球队...">
                     <i class="fas fa-search absolute right-3 top-3 text-gray-400"></i>
                 </div>
             </div>
@@ -98,34 +119,34 @@
                 <p class="mt-2 text-gray-600">正在加载数据...</p>
             </div>
 
-            <!-- 修改后的数据列表部分 -->
-<div id="bindingList" class="overflow-x-auto">
-    <div class="min-w-4xl grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- 数据源1 -->
-        <div class="source-1">
-            <h3 class="text-lg font-semibold text-blue-600 mb-4 p-2 bg-blue-50 rounded">
-                <i class="fas fa-database mr-2"></i>1网数据
-            </h3>
-            <div id="source1Content"></div>
-        </div>
+            <!-- 数据列表 -->
+            <div id="bindingList" class="overflow-x-auto">
+                <div class="min-w-4xl grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- 数据源1 -->
+                    <div class="source-1">
+                        <h3 class="text-lg font-semibold text-blue-600 mb-4 p-2 bg-blue-50 rounded">
+                            <i class="fas fa-database mr-2"></i>1网数据
+                        </h3>
+                        <div id="source1Content"></div>
+                    </div>
 
-        <!-- 数据源2 -->
-        <div class="source-2">
-            <h3 class="text-lg font-semibold text-green-600 mb-4 p-2 bg-green-50 rounded">
-                <i class="fas fa-database mr-2"></i>2网数据
-            </h3>
-            <div id="source2Content"></div>
-        </div>
+                    <!-- 数据源2 -->
+                    <div class="source-2">
+                        <h3 class="text-lg font-semibold text-green-600 mb-4 p-2 bg-green-50 rounded">
+                            <i class="fas fa-database mr-2"></i>2网数据
+                        </h3>
+                        <div id="source2Content"></div>
+                    </div>
 
-        <!-- 数据源3 -->
-        <div class="source-3">
-            <h3 class="text-lg font-semibold text-orange-600 mb-4 p-2 bg-orange-50 rounded">
-                <i class="fas fa-database mr-2"></i>3网数据
-            </h3>
-            <div id="source3Content"></div>
-        </div>
-    </div>
-</div>
+                    <!-- 数据源3 -->
+                    <div class="source-3">
+                        <h3 class="text-lg font-semibold text-orange-600 mb-4 p-2 bg-orange-50 rounded">
+                            <i class="fas fa-database mr-2"></i>3网数据
+                        </h3>
+                        <div id="source3Content"></div>
+                    </div>
+                </div>
+            </div>
 
             <!-- 空状态 -->
             <div id="emptyState" class="hidden text-center py-12">
@@ -143,76 +164,54 @@
     </footer>
 
     <script>
-
-
-// 添加缺失的showError函数
-function showError(message) {
-    const container = document.getElementById('bindingList');
-    container.innerHTML = `
-        <div class="col-span-full text-center py-8">
-            <i class="fas fa-exclamation-triangle text-2xl text-red-500"></i>
-            <p class="mt-2 text-red-500">${message}</p>
-        </div>
-    `;
-}
-
-// 确保保留fetchBindings函数
-async function fetchBindings() {
-    try {
-        const response = await fetch('http://localhost:8080/api/bindings');
-        if (!response.ok) throw new Error('数据获取失败');
-        return await response.json();
-    } catch (error) {
-        console.error('获取绑定记录失败:', error);
-        showError('无法加载数据，请稍后重试');
-        return [];
-    }
-}
-
-
-// 新数据处理逻辑
-function processBindings(bindings) {
-    const sources = {1:{}, 2:{}, 3:{}};
-
-    bindings.forEach(binding => {
-        // 处理每个数据源
-        [1,2,3].forEach(source => {
-            const leagueKey = `source${source}League`;
-            const homeKey = `source${source}HomeTeam`;
-            const awayKey = `source${source}AwayTeam`;
-            
-            const league = binding[leagueKey];
-            if(!league) return;
-
-            // 初始化联赛结构
-            if(!sources[source][league]) {
-                sources[source][league] = new Set();
+        // 数据获取函数
+        async function fetchBindings() {
+            try {
+                const response = await fetch('http://localhost:8080/api/bindings');
+                if (!response.ok) throw new Error('数据获取失败');
+                return await response.json();
+            } catch (error) {
+                console.error('获取绑定记录失败:', error);
+                showError('无法加载数据，请稍后重试');
+                return [];
             }
+        }
 
-            // 添加队伍并去重
-            sources[source][league].add(binding[homeKey]);
-            sources[source][league].add(binding[awayKey]);
-        });
-    });
+        // 数据处理逻辑
+        function processBindings(bindings) {
+            const sources = { 1: {}, 2: {}, 3: {} };
+            bindings.forEach(binding => {
+                [1, 2, 3].forEach(source => {
+                    const league = binding[`source${source}League`];
+                    if (!league) return;
 
-    return sources;
-}
+                    if (!sources[source][league]) {
+                        sources[source][league] = { homeTeams: new Set(), awayTeams: new Set() };
+                    }
+                    const homeTeam = binding[`source${source}HomeTeam`];
+                    const awayTeam = binding[`source${source}AwayTeam`];
+                    if (homeTeam) sources[source][league].homeTeams.add(homeTeam);
+                    if (awayTeam) sources[source][league].awayTeams.add(awayTeam);
+                });
+            });
+            return sources;
+        }
 
-// 修改后的渲染逻辑
-function renderSources(sources) {
-            [1,2,3].forEach(source => {
+        // 渲染逻辑
+        function renderSources(sources) {
+            [1, 2, 3].forEach(source => {
                 const container = document.getElementById(`source${source}Content`);
                 const sourceData = sources[source];
-                
-                if(Object.keys(sourceData).length === 0) {
+
+                if (Object.keys(sourceData).length === 0) {
                     container.innerHTML = `<div class="text-gray-500 p-4">暂无数据</div>`;
                     return;
                 }
 
                 let html = '';
-                Object.entries(sourceData).forEach(([league, teams]) => {
+                Object.entries(sourceData).forEach(([league, teamsData]) => {
                     html += `
-                        <div class="league-group bg-white rounded-lg shadow-sm mb-4 collapsed">
+                        <div class="league-group bg-white rounded-lg shadow-sm mb-4">
                             <div class="league-header p-3 border-b border-gray-100 bg-gray-50">
                                 <div class="flex items-center">
                                     <span class="league-badge">联赛</span>
@@ -226,8 +225,29 @@ function renderSources(sources) {
                                         <i class="fas fa-users mr-2"></i>球队列表
                                     </div>
                                     <div class="space-y-1">
-                                        ${Array.from(teams).map(team => `
-                                            <div class="team-item">${team}</div>
+                                        ${Array.from(teamsData.homeTeams).map(team => `
+                                            <div class="team-item">
+                                                ${team}
+                                                <button class="delete-btn text-red-400 hover:text-red-600"
+                                                    data-source="${source}"
+                                                    data-league="${encodeURIComponent(league)}"
+                                                    data-team="${encodeURIComponent(team)}"
+                                                    data-team-type="home">
+                                                    <i class="fas fa-trash text-sm"></i>
+                                                </button>
+                                            </div>
+                                        `).join('')}
+                                        ${Array.from(teamsData.awayTeams).map(team => `
+                                            <div class="team-item">
+                                                ${team}
+                                                <button class="delete-btn text-red-400 hover:text-red-600"
+                                                    data-source="${source}"
+                                                    data-league="${encodeURIComponent(league)}"
+                                                    data-team="${encodeURIComponent(team)}"
+                                                    data-team-type="away">
+                                                    <i class="fas fa-trash text-sm"></i>
+                                                </button>
+                                            </div>
                                         `).join('')}
                                     </div>
                                 </div>
@@ -237,67 +257,99 @@ function renderSources(sources) {
                 });
                 container.innerHTML = html;
 
-                // 添加折叠点击事件
+                // 折叠功能
                 container.querySelectorAll('.league-header').forEach(header => {
-                    header.addEventListener('click', function() {
-                        const parent = this.closest('.league-group');
-                        parent.classList.toggle('collapsed');
+                    header.addEventListener('click', () => {
+                        header.parentElement.classList.toggle('collapsed');
                     });
                 });
             });
-        }
 
-        // 修改后的搜索功能
-        function setupSearch() {
-            document.getElementById('searchInput').addEventListener('input', (e) => {
-                const searchTerm = e.target.value.toLowerCase().trim();
-                
-                [1,2,3].forEach(source => {
-                    const container = document.getElementById(`source${source}Content`);
-                    Array.from(container.querySelectorAll('.league-group')).forEach(group => {
-                        const league = group.querySelector('.league-title').textContent.toLowerCase();
-                        const teams = Array.from(group.querySelectorAll('.team-item'))
-                                        .map(team => team.textContent.toLowerCase());
-                        
-                        const matchLeague = league.includes(searchTerm);
-                        const matchTeam = teams.some(t => t.includes(searchTerm));
-                        
-                        group.style.display = (matchLeague || matchTeam) ? 'block' : 'none';
-                        
-                        // 自动展开匹配的联赛
-                        if (matchLeague || matchTeam) {
-                            group.classList.remove('collapsed');
-                        }
-                    });
-                });
+            // 绑定删除事件
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', handleDelete);
             });
         }
 
- // 修改后的初始化函数
+        // 删除处理函数
+        async function handleDelete(event) {
+            const btn = event.currentTarget;
+            const source = btn.dataset.source;
+            const league = decodeURIComponent(btn.dataset.league);
+            const team = decodeURIComponent(btn.dataset.team);
+            const teamType = btn.dataset.teamType;
+
+            if (!confirm(`确定要删除【${league} - ${team}】及所有关联数据吗？`)) return;
+
+            try {
+                const response = await fetch(`http://localhost:8080/api/bindings?source=${source}&league=${encodeURIComponent(league)}&team=${encodeURIComponent(team)}&teamType=${teamType}`, {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok) throw new Error(await response.text());
+                showToast('删除成功', 'success');
+                init(); // 重新加载数据
+            } catch (error) {
+                console.error('删除失败:', error);
+                showToast(`删除失败: ${error.message}`, 'error');
+            }
+        }
+
+        // 其他辅助函数
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `fixed top-4 right-4 px-6 py-3 rounded-md text-white ${type === 'success' ? 'bg-green-500' : 'bg-red-500'}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function showError(message) {
+            const container = document.getElementById('bindingList');
+            container.innerHTML = `
+                <div class="col-span-full text-center py-8">
+                    <i class="fas fa-exclamation-triangle text-2xl text-red-500"></i>
+                    <p class="mt-2 text-red-500">${message}</p>
+                </div>
+            `;
+        }
+
+        // 初始化函数
         async function init() {
             try {
                 const bindings = await fetchBindings();
                 document.getElementById('loading').style.display = 'none';
-                
-                const processedData = processBindings(bindings);
-                renderSources(processedData);
-                setupSearch(); // 初始化搜索功能
-
-                // 隐藏空状态（如果不需要可以删除）
-                if (bindings.length > 0) {
-                    document.getElementById('emptyState').classList.add('hidden');
-                }
-
+                renderSources(processBindings(bindings));
+                setupSearch();
+                document.getElementById('emptyState').classList.toggle('hidden', bindings.length > 0);
             } catch (error) {
                 document.getElementById('loading').style.display = 'none';
                 showError('数据加载失败');
             }
         }
 
-        // 页面加载完成后执行
+        // 搜索功能
+        function setupSearch() {
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', () => {
+                const term = searchInput.value.toLowerCase().trim();
+                [1, 2, 3].forEach(source => {
+                    const container = document.getElementById(`source${source}Content`);
+                    container.querySelectorAll('.league-group').forEach(group => {
+                        const league = group.querySelector('.league-title').textContent.toLowerCase();
+                        const teams = Array.from(group.querySelectorAll('.team-item')).map(t => t.childNodes[0].textContent.toLowerCase());
+                        const visible = league.includes(term) || teams.some(t => t.includes(term));
+                        group.style.display = visible ? 'block' : 'none';
+                        if (visible) group.classList.remove('collapsed');
+                    });
+                });
+            });
+        }
+
+        // 初始化页面
         document.addEventListener('DOMContentLoaded', init);
     </script>
 
 </body>
 
-</html>
+</html>    
