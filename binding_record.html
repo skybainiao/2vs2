@@ -167,7 +167,7 @@
         // 数据获取函数
         async function fetchBindings() {
             try {
-                const response = await fetch('http://localhost:8080/api/bindings');
+                const response = await fetch('http://160.25.20.123:8080/api/bindings');
                 if (!response.ok) throw new Error('数据获取失败');
                 return await response.json();
             } catch (error) {
@@ -198,78 +198,84 @@
         }
 
         // 渲染逻辑
-        function renderSources(sources) {
-            [1, 2, 3].forEach(source => {
-                const container = document.getElementById(`source${source}Content`);
-                const sourceData = sources[source];
+function renderSources(sources) {
+    [1, 2, 3].forEach(source => {
+        const container = document.getElementById(`source${source}Content`);
+        const sourceData = sources[source];
 
-                if (Object.keys(sourceData).length === 0) {
-                    container.innerHTML = `<div class="text-gray-500 p-4">暂无数据</div>`;
-                    return;
-                }
+        if (Object.keys(sourceData).length === 0) {
+            container.innerHTML = `<div class="text-gray-500 p-4">暂无数据</div>`;
+            return;
+        }
 
-                let html = '';
-                Object.entries(sourceData).forEach(([league, teamsData]) => {
-                    html += `
-                        <div class="league-group bg-white rounded-lg shadow-sm mb-4">
-                            <div class="league-header p-3 border-b border-gray-100 bg-gray-50">
-                                <div class="flex items-center">
-                                    <span class="league-badge">联赛</span>
-                                    <h4 class="league-title">${league}</h4>
-                                </div>
-                                <i class="collapse-icon fas fa-chevron-down text-gray-400"></i>
+        // 对联赛名称进行字母排序
+        const sortedLeagues = Object.entries(sourceData).sort(([leagueA], [leagueB]) => {
+            return leagueA.localeCompare(leagueB);
+        });
+
+        let html = '';
+        sortedLeagues.forEach(([league, teamsData]) => {
+            html += `
+                <div class="league-group bg-white rounded-lg shadow-sm mb-4 collapsed ">
+                    <div class="league-header p-3 border-b border-gray-100 bg-gray-50">
+                        <div class="flex items-center">
+                            <span class="league-badge">联赛</span>
+                            <h4 class="league-title">${league}</h4>
+                        </div>
+                        <i class="collapse-icon fas fa-chevron-down text-gray-400"></i>
+                    </div>
+                    <div class="team-list">
+                        <div class="p-3">
+                            <div class="team-section-title">
+                                <i class="fas fa-users mr-2"></i>球队列表
                             </div>
-                            <div class="team-list">
-                                <div class="p-3">
-                                    <div class="team-section-title">
-                                        <i class="fas fa-users mr-2"></i>球队列表
+                            <div class="space-y-1">
+                                ${Array.from(teamsData.homeTeams).map(team => `
+                                    <div class="team-item">
+                                        ${team}
+                                        <button class="delete-btn text-red-400 hover:text-red-600"
+                                            data-source="${source}"
+                                            data-league="${encodeURIComponent(league)}"
+                                            data-team="${encodeURIComponent(team)}"
+                                            data-team-type="home">
+                                            <i class="fas fa-trash text-sm"></i>
+                                        </button>
                                     </div>
-                                    <div class="space-y-1">
-                                        ${Array.from(teamsData.homeTeams).map(team => `
-                                            <div class="team-item">
-                                                ${team}
-                                                <button class="delete-btn text-red-400 hover:text-red-600"
-                                                    data-source="${source}"
-                                                    data-league="${encodeURIComponent(league)}"
-                                                    data-team="${encodeURIComponent(team)}"
-                                                    data-team-type="home">
-                                                    <i class="fas fa-trash text-sm"></i>
-                                                </button>
-                                            </div>
-                                        `).join('')}
-                                        ${Array.from(teamsData.awayTeams).map(team => `
-                                            <div class="team-item">
-                                                ${team}
-                                                <button class="delete-btn text-red-400 hover:text-red-600"
-                                                    data-source="${source}"
-                                                    data-league="${encodeURIComponent(league)}"
-                                                    data-team="${encodeURIComponent(team)}"
-                                                    data-team-type="away">
-                                                    <i class="fas fa-trash text-sm"></i>
-                                                </button>
-                                            </div>
-                                        `).join('')}
+                                `).join('')}
+                                ${Array.from(teamsData.awayTeams).map(team => `
+                                    <div class="team-item">
+                                        ${team}
+                                        <button class="delete-btn text-red-400 hover:text-red-600"
+                                            data-source="${source}"
+                                            data-league="${encodeURIComponent(league)}"
+                                            data-team="${encodeURIComponent(team)}"
+                                            data-team-type="away">
+                                            <i class="fas fa-trash text-sm"></i>
+                                        </button>
                                     </div>
-                                </div>
+                                `).join('')}
                             </div>
                         </div>
-                    `;
-                });
-                container.innerHTML = html;
+                    </div>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
 
-                // 折叠功能
-                container.querySelectorAll('.league-header').forEach(header => {
-                    header.addEventListener('click', () => {
-                        header.parentElement.classList.toggle('collapsed');
-                    });
-                });
+        // 折叠功能
+        container.querySelectorAll('.league-header').forEach(header => {
+            header.addEventListener('click', () => {
+                header.parentElement.classList.toggle('collapsed');
             });
+        });
+    });
 
-            // 绑定删除事件
-            document.querySelectorAll('.delete-btn').forEach(btn => {
-                btn.addEventListener('click', handleDelete);
-            });
-        }
+    // 绑定删除事件
+    document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', handleDelete);
+    });
+}
+    
 
         // 删除处理函数
         async function handleDelete(event) {
@@ -282,7 +288,7 @@
             if (!confirm(`确定要删除【${league} - ${team}】及所有关联数据吗？`)) return;
 
             try {
-                const response = await fetch(`http://localhost:8080/api/bindings?source=${source}&league=${encodeURIComponent(league)}&team=${encodeURIComponent(team)}&teamType=${teamType}`, {
+                const response = await fetch(`http://160.25.20.123:8080/api/bindings?source=${source}&league=${encodeURIComponent(league)}&team=${encodeURIComponent(team)}&teamType=${teamType}`, {
                     method: 'DELETE'
                 });
 

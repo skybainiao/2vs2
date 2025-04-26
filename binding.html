@@ -281,7 +281,7 @@
                         <!-- 功能按钮 -->
                         <div class="flex items-center space-x-1">
                             <!-- 刷新按钮统一为 custom-btn 样式（保留原有灰色基调） -->
-                            <button class="custom-btn text-xs" onclick="fetchData('http://localhost:6001/today_fixtures', 'a', this)">
+                            <button class="custom-btn text-xs" onclick="fetchData('http://103.67.52.236:6001/today_fixtures', 'a', this)">
                                 刷新
                             </button>
                             <div class="loading" id="a-loading"></div>
@@ -322,7 +322,7 @@
                         </div>
                         <!-- 功能按钮 -->
                         <div class="flex items-center space-x-1">
-                            <button class="custom-btn text-xs" onclick="fetchData('http://localhost:6002/matches', 'b', this)">
+                            <button class="custom-btn text-xs" onclick="fetchData('http://103.67.52.236:6002/matches', 'b', this)">
                                 刷新
                             </button>
                             <div class="loading" id="b-loading"></div>
@@ -363,7 +363,7 @@
                         </div>
                         <!-- 功能按钮 -->
                         <div class="flex items-center space-x-1">
-                            <button class="custom-btn text-xs" onclick="fetchData('http://localhost:6003/get_soccer_events', 'c', this)">
+                            <button class="custom-btn text-xs" onclick="fetchData('http://103.67.52.236:6003/get_soccer_events', 'c', this)">
                                 刷新
                             </button>
                             <div class="loading" id="c-loading"></div>
@@ -542,7 +542,7 @@ async function fetchData(url, source, button) {
 
         // 步骤3：发送重复检查请求
         const sourceNumber = source === 'a' ? 1 : source === 'b' ? 2 : 3;
-        const checkResponse = await fetch('http://localhost:8080/api/bindings/check-duplicates', {
+        const checkResponse = await fetch('http://160.25.20.123:8080/api/bindings/check-duplicates', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -746,7 +746,7 @@ document.querySelector('button.custom-btn[style="color: green;"]').addEventListe
         });
 
         // 发送提交请求
-        const response = await fetch('http://localhost:8080/api/bindings', {
+        const response = await fetch('http://160.25.20.123:8080/api/bindings', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
