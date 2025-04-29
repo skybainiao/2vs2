@@ -425,39 +425,39 @@
     <script>
 
         
-        // 必须最先定义的绑定管理器
-    const bindingManager = {
-        usedMatches: new Set(),
-        
-        isBound(source, match) {
-            return this.usedMatches.has(`${source}-${match.league}-${match.home_team}-${match.away_team}`);
-        },
-        
-        addBinding(source, match) {
-            this.usedMatches.add(`${source}-${match.league}-${match.home_team}-${match.away_team}`);
-        },
-        
-        removeBinding(source, match) {
-            this.usedMatches.delete(`${source}-${match.league}-${match.home_team}-${match.away_team}`);
-        },
-        
-        clear() {
-            this.usedMatches.clear();
-        }
-    };
+    // 必须最先定义的绑定管理器
+const bindingManager = {
+    usedMatches: new Set(),
 
-    // 原数据结构和初始化
-    const selectedFixtures = { a: null, b: null, c: null };
-    const dataSources = {
-        a: { tableId: 'a-table', source: 'a', color: '#4B52F8' },
-        b: { tableId: 'b-table', source: 'b', color: '#2DD4BF' },
-        c: { tableId: 'c-table', source: 'c', color: '#F59E0B' },
-    };
-    let dataSourcesData = {
-        a: { fixtures: [], table: null, searchInput: null },
-        b: { fixtures: [], table: null, searchInput: null },
-        c: { fixtures: [], table: null, searchInput: null }
-    };
+    isBound(source, match) {
+        return this.usedMatches.has(`${source}-${match.league}-${match.home_team}-${match.away_team}`);
+    },
+
+    addBinding(source, match) {
+        this.usedMatches.add(`${source}-${match.league}-${match.home_team}-${match.away_team}`);
+    },
+
+    removeBinding(source, match) {
+        this.usedMatches.delete(`${source}-${match.league}-${match.home_team}-${match.away_team}`);
+    },
+
+    clear() {
+        this.usedMatches.clear();
+    }
+};
+
+   // 原数据结构和初始化
+const selectedFixtures = { a: null, b: null, c: null };
+const dataSources = {
+    a: { tableId: 'a-table', source: 'a', color: '#4B52F8' },
+    b: { tableId: 'b-table', source: 'b', color: '#2DD4BF' },
+    c: { tableId: 'c-table', source: 'c', color: '#F59E0B' },
+};
+let dataSourcesData = {
+    a: { fixtures: [], table: null, searchInput: null },
+    b: { fixtures: [], table: null, searchInput: null },
+    c: { fixtures: [], table: null, searchInput: null }
+};
 
     // 强化清空功能
 document.querySelector('button.custom-btn[style*="color: #e53e3e;"]').addEventListener('click', () => {
@@ -473,57 +473,58 @@ document.querySelector('button.custom-btn[style*="color: #e53e3e;"]').addEventLi
 });
         
         // 选中行处理函数（优化版）
-        function selectRow(row, source) {
-            // 清除当前数据源之前的选中
-            const prevSelected = document.querySelector(`#${dataSources[source].tableId} tr.selected-row`);
-            if (prevSelected) prevSelected.classList.remove('selected-row');
+function selectRow(row, source) {
+    // 清除当前数据源之前的选中
+    const prevSelected = document.querySelector(`#${dataSources[source].tableId} tr.selected-row`);
+    if (prevSelected) prevSelected.classList.remove('selected-row');
 
-            row.classList.add('selected-row');
-            const index = row.dataset.fixtureIndex;
-            selectedFixtures[source] = dataSourcesData[source].fixtures[index]; // 存储选中数据
+    row.classList.add('selected-row');
+    const index = row.dataset.fixtureIndex;
+    selectedFixtures[source] = dataSourcesData[source].fixtures[index]; // 存储选中数据
 
-            // 检查是否三网都已选中
-            const allSelected = Object.values(selectedFixtures).every(f => f);
-            document.getElementById('add-binding-btn').disabled = !allSelected;
-        }
+    // 检查是否三网都已选中
+    const allSelected = Object.values(selectedFixtures).every(f => f);
+    document.getElementById('add-binding-btn').disabled = !allSelected;
+}
+
 
         // 通用搜索过滤函数
-        function filterFixtures(source, keyword) {
-            const { fixtures, table } = dataSourcesData[source];
-            const tbody = table.getElementsByTagName('tbody')[0];
-            const rows = tbody.querySelectorAll('tr');
+function filterFixtures(source, keyword) {
+    const { fixtures, table } = dataSourcesData[source];
+    const tbody = table.getElementsByTagName('tbody')[0];
+    const rows = tbody.querySelectorAll('tr');
 
-            keyword = keyword.trim().toLowerCase();
-            rows.forEach((row, index) => {
-                const fixture = fixtures[index]; // 假设数据顺序与表格行一致
-                if (!fixture) return; // 防止数据错位
+    keyword = keyword.trim().toLowerCase();
+    rows.forEach((row, index) => {
+        const fixture = fixtures[index]; // 假设数据顺序与表格行一致
+        if (!fixture) return; // 防止数据错位
 
-                // 提取关键信息（时间、联赛、主客队）
-                const time = fixture.time.toLowerCase();
-                const league = fixture.league.toLowerCase();
-                const home = fixture.home_team.toLowerCase();
-                const away = fixture.away_team.toLowerCase();
+        // 提取关键信息（时间、联赛、主客队）
+        const time = fixture.time.toLowerCase();
+        const league = fixture.league.toLowerCase();
+        const home = fixture.home_team.toLowerCase();
+        const away = fixture.away_team.toLowerCase();
 
-                // 检查是否包含关键词（支持多关键词，空格分隔为"与"关系）
-                const match = keyword.split(' ').every(word => {
-                    return time.includes(word) ||
-                        league.includes(word) ||
-                        home.includes(word) ||
-                        away.includes(word);
-                });
+        // 检查是否包含关键词（支持多关键词，空格分隔为"与"关系）
+        const match = keyword.split(' ').every(word => {
+            return time.includes(word) ||
+                league.includes(word) ||
+                home.includes(word) ||
+                away.includes(word);
+        });
 
-                row.style.display = match ? '' : 'none'; // 显示/隐藏行
-            });
-        }
+        row.style.display = match ? '' : 'none'; // 显示/隐藏行
+    });
+}
 
-        // 防抖函数
-        function debounce(func, delay) {
-            let timeoutId;
-            return function (...args) {
-                clearTimeout(timeoutId);
-                timeoutId = setTimeout(() => func.apply(this, args), delay);
-            };
-        }
+// 防抖函数
+function debounce(func, delay) {
+    let timeoutId;
+    return function (...args) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => func.apply(this, args), delay);
+    };
+}
 
     // 从接口获取数据并填充表格（完整修复版）
 async function fetchData(url, source, button) {
@@ -568,7 +569,7 @@ async function fetchData(url, source, button) {
 
         // 步骤4：处理重复数据（修复关键点）
         const duplicates = await checkResponse.json();
-        
+
         // 转换数组为Set
         const leaguesSet = new Set(duplicates.leagues || []);
         const teamsSet = new Set(duplicates.teams || []);
@@ -636,61 +637,104 @@ async function fetchData(url, source, button) {
 
 
         // 添加绑定按钮点击事件
-        document.getElementById('add-binding-btn').addEventListener('click', () => {
-            const boundItem = document.createElement('div');
-            boundItem.className = 'bound-item';
+document.getElementById('add-binding-btn').addEventListener('click', () => {
+    // 检查是否存在重复数据
+    const isDuplicate = Object.entries(selectedFixtures).some(([source, match]) => {
+        return bindingManager.isBound(source, match);
+    });
 
-            // 生成三个网络的显示块
-            ['a', 'b', 'c'].forEach(source => {
-                const fixture = selectedFixtures[source];
-                const networkDiv = document.createElement('div');
-                networkDiv.className = `network-data bg-${source === 'a' ? 'blue' : source === 'b' ? 'green' : 'orange'}-50`;
+    if (isDuplicate) {
+        alert('所选比赛已存在绑定记录，请勿重复添加！');
+        return;
+    }
 
-                networkDiv.innerHTML = `
-                    <div class="network-label">${
-                        source === 'a' ? '1' : 
-                        source === 'b' ? '2' : '3'
-                        }网数据</div>
-                    <div>联赛：${fixture.league}</div>
-                    <div>主队：${fixture.home_team}</div>
-                    <div>客队：${fixture.away_team}</div>
-                    <div>时间：${fixture.time}</div>
-                `;
+    const boundItem = document.createElement('div');
+    boundItem.className = 'bound-item';
+    
 
-                boundItem.appendChild(networkDiv);
-            });
+    // 生成三个网络的显示块
+    ['a', 'b', 'c'].forEach(source => {
+        const fixture = selectedFixtures[source];
+        const networkDiv = document.createElement('div');
+        networkDiv.className = `network-data bg-${source === 'a' ? 'blue' : source === 'b' ? 'green' : 'orange'}-50`;
 
-            // 添加删除功能
-            const deleteBtn = document.createElement('button');
-            deleteBtn.className = 'delete-btn'; // 使用新定义的样式类
-            deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
-            deleteBtn.onclick = () => boundItem.remove();
-            boundItem.appendChild(deleteBtn);
+        networkDiv.innerHTML = `
+            <div class="network-label">${
+                source === 'a' ? '1' : 
+                source === 'b' ? '2' : '3'
+                }网数据</div>
+            <div>联赛：${fixture.league}</div>
+            <div>主队：${fixture.home_team}</div>
+            <div>客队：${fixture.away_team}</div>
+            <div>时间：${fixture.time}</div>
+        `;
 
-            document.getElementById('bound-matches-container').prepend(boundItem);
+        boundItem.appendChild(networkDiv);
+        bindingManager.addBinding(source, fixture);
+    });
 
-            // 清除选中状态
-            Object.keys(selectedFixtures).forEach(source => {
-                selectedFixtures[source] = null;
-                const table = dataSourcesData[source].table;
-                table.querySelectorAll('tr').forEach(tr => tr.classList.remove('selected-row'));
-            });
-            document.getElementById('add-binding-btn').disabled = true;
-        });
+    // 添加删除功能
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'delete-btn'; // 使用新定义的样式类
+    deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
+    // 修改后正确版本：
+deleteBtn.onclick = function() {
+    // 获取被删除条目的真实数据
+    const networks = this.parentElement.querySelectorAll('.network-data');
+    const bindData = {
+        a: getDataFromDiv(networks[0]),
+        b: getDataFromDiv(networks[1]),
+        c: getDataFromDiv(networks[2])
+    };
 
-        // 初始化搜索框监听
-        document.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('input[data-source]').forEach(input => {
-                const source = input.dataset.source;
-                input.addEventListener('input', debounce((e) => {
-                    filterFixtures(source, e.target.value);
-                }, 300)); // 300ms防抖延迟
-            });
-        });
+    // 移除状态记录
+    Object.entries(bindData).forEach(([source, data]) => {
+        bindingManager.removeBinding(source, data);
+    });
+
+    // 删除DOM元素
+    this.parentElement.remove();
+
+    // 更新所有表格
+    ['a', 'b', 'c'].forEach(s => updateTable(s));
+};
+    boundItem.appendChild(deleteBtn);
+
+    document.getElementById('bound-matches-container').prepend(boundItem);
+
+    // 清除选中状态
+    Object.keys(selectedFixtures).forEach(source => {
+        selectedFixtures[source] = null;
+        const table = dataSourcesData[source].table;
+        table.querySelectorAll('tr').forEach(tr => tr.classList.remove('selected-row'));
+    });
+    document.getElementById('add-binding-btn').disabled = true;
+});
 
 
+// 新增辅助函数
+function getDataFromDiv(div) {
+    return {
+        league: div.children[1].textContent.split('：')[1].trim(),
+        home_team: div.children[2].textContent.split('：')[1].trim(),
+        away_team: div.children[3].textContent.split('：')[1].trim(),
+        time: div.children[4].textContent.split('：')[1].trim()
+    };
+}
 
-       // 修复后的updateTable函数
+
+// 初始化搜索框监听
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('input[data-source]').forEach(input => {
+        const source = input.dataset.source;
+        input.addEventListener('input', debounce((e) => {
+            filterFixtures(source, e.target.value);
+        }, 300)); // 300ms防抖延迟
+    });
+});
+
+
+ // 修复后的updateTable函数
 function updateTable(source) {
     const { fixtures, table, searchInput } = dataSourcesData[source];
     const tbody = table.getElementsByTagName('tbody')[0];
@@ -753,7 +797,7 @@ document.querySelector('button.custom-btn[style="color: green;"]').addEventListe
         });
 
         // 发送提交请求
-        const response = await fetch('http://160.25.20.123:8080/api/bindings', {
+        const response = await fetch('http://localhost:8080/api/bindings', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -809,8 +853,8 @@ document.querySelector('button.custom-btn[style="color: green;"]').addEventListe
 // 新增单词分割函数
 const splitWords = (str) => {
     return str.toLowerCase()
-        .split(/[^\w\u4e00-\u9fa5]+/) // 分割单词（保留中文和字母数字）
-        .filter(word => word.length > 1); // 过滤单字符
+      .split(/[^\w\u4e00-\u9fa5]+/) // 分割单词（保留中文和字母数字）
+      .filter(word => word.length > 1); // 过滤单字符
 };
 
 // 完整快速绑定函数
@@ -826,8 +870,8 @@ async function quickBind() {
         // 准备数据：为每个比赛创建单词索引
         const prepareMatches = (source) => {
             return dataSourcesData[source].fixtures
-                .filter(f => !bindingManager.isBound(source, f)) // 过滤已绑定
-                .map(match => ({
+              .filter(f => !bindingManager.isBound(source, f)) // 过滤已绑定
+              .map(match => ({
                     raw: match, // 保留原始数据引用
                     source: source,
                     time: match.time,
@@ -850,14 +894,14 @@ async function quickBind() {
                 // 第一阶段：AB匹配检查
                 // 1. 时间必须一致
                 if (aMatch.time !== bMatch.time) continue;
-                
+
                 // 2. 联赛字段至少一个共同词
                 const hasLeagueMatchAB = [...aMatch.leagueWords].some(w => bMatch.leagueWords.has(w));
                 // 3. 主队字段至少一个共同词
                 const hasHomeMatchAB = [...aMatch.homeWords].some(w => bMatch.homeWords.has(w));
                 // 4. 客队字段至少一个共同词
                 const hasAwayMatchAB = [...aMatch.awayWords].some(w => bMatch.awayWords.has(w));
-                
+
                 if (!hasLeagueMatchAB || !hasHomeMatchAB || !hasAwayMatchAB) continue;
 
                 // 第二阶段：寻找匹配的C网数据
@@ -880,7 +924,7 @@ async function quickBind() {
                     // 最终匹配条件：AC或BC完全匹配
                     if (isACValid || isBCValid) {
                         // 检查是否已绑定
-                        const isUsed = [aMatch, bMatch, cMatch].some(m => 
+                        const isUsed = [aMatch, bMatch, cMatch].some(m =>
                             bindingManager.isBound(m.source, m.raw)
                         );
                         if (isUsed) continue;
@@ -914,15 +958,15 @@ async function quickBind() {
                     div.className = `network-data bg-${{
                         a: 'blue', b: 'green', c: 'orange'
                     }[source]}-50 p-2 rounded`;
-                    
+
                     div.innerHTML = `
-                        <div class="network-label font-bold">${index+1}网数据</div>
+                        <div class="network-label font-bold">${index + 1}网数据</div>
                         <div class="text-sm">联赛：${match.league}</div>
                         <div class="text-sm">主队：${match.home_team}</div>
                         <div class="text-sm">客队：${match.away_team}</div>
                         <div class="text-xs text-gray-500">时间：${match.time}</div>
                     `;
-                    
+
                     boundItem.appendChild(div);
                 });
 
@@ -935,11 +979,11 @@ async function quickBind() {
                     bindingManager.removeBinding('a', combo.a);
                     bindingManager.removeBinding('b', combo.b);
                     bindingManager.removeBinding('c', combo.c);
-                    
+
                     // 更新原始数据状态
                     ['a', 'b', 'c'].forEach(source => {
                         const match = combo[source];
-                        const original = dataSourcesData[source].fixtures.find(f => 
+                        const original = dataSourcesData[source].fixtures.find(f =>
                             f.league === match.league &&
                             f.home_team === match.home_team &&
                             f.away_team === match.away_team
@@ -950,7 +994,7 @@ async function quickBind() {
 
                     boundItem.remove();
                 };
-                
+
                 boundItem.appendChild(deleteBtn);
                 document.getElementById('bound-matches-container').appendChild(boundItem);
             });

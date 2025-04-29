@@ -167,7 +167,7 @@
         // 数据获取函数
         async function fetchBindings() {
             try {
-                const response = await fetch('http://160.25.20.123:8080/api/bindings');
+                const response = await fetch('http://localhost:8080/api/bindings');
                 if (!response.ok) throw new Error('数据获取失败');
                 return await response.json();
             } catch (error) {
@@ -288,7 +288,7 @@ function renderSources(sources) {
             if (!confirm(`确定要删除【${league} - ${team}】及所有关联数据吗？`)) return;
 
             try {
-                const response = await fetch(`http://160.25.20.123:8080/api/bindings?source=${source}&league=${encodeURIComponent(league)}&team=${encodeURIComponent(team)}&teamType=${teamType}`, {
+                const response = await fetch(`http://localhost:8080/api/bindings?source=${source}&league=${encodeURIComponent(league)}&team=${encodeURIComponent(team)}&teamType=${teamType}`, {
                     method: 'DELETE'
                 });
 
